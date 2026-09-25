@@ -38,4 +38,6 @@ in
       fi
     '';
   };
+
+  programs.ssh.startAgent = true;
 }
