@@ -3,7 +3,6 @@
 {
   imports = [
     ../../packages/antigravity.nix
-    ../../packages/btop.nix
     ../../packages/direnv.nix
     ../../packages/fish.nix
     ../../packages/git.nix
@@ -18,13 +17,17 @@
     ../../packages/quickshell.nix
     ../../packages/starship.nix
     ../../packages/swayimg.nix
-    ../../packages/thunar.nix
     ../../packages/yazi.nix
 
     ../../modules/dev/cpp.nix
 
+    ../../apps
+
     ../../packages/ssh.nix
   ];
+
+  custom.apps.btop.enable = true;
+  custom.apps.thunar.enable = true;
 
   myCustom.dev.cpp.enable = true;
 
