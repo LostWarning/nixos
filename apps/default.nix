@@ -10,6 +10,8 @@
 
     ./posting.nix
 
+    ./swayimg.nix
+
     ./thunar.nix
   ];
 }

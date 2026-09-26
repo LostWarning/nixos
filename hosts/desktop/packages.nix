@@ -13,7 +13,6 @@
     ../../packages/npm.nix
     ../../packages/quickshell.nix
     ../../packages/starship.nix
-    ../../packages/swayimg.nix
     ../../packages/yazi.nix
 
     ../../modules/dev/cpp.nix
@@ -31,6 +30,8 @@
     git.enable = true;
 
     posting.enable = true;
+
+    swayimg.enable = true;
 
     thunar.enable = true;
   };
