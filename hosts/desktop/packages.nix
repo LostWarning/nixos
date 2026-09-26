@@ -3,7 +3,6 @@
 {
   imports = [
     ../../packages/antigravity.nix
-    ../../packages/googlechrome.nix
     ../../packages/hyprland.nix
     ../../packages/mpd.nix
     ../../packages/neovim.nix
@@ -27,6 +26,7 @@
     fish.enable = true;
 
     git.enable = true;
+    google-chrome.enable = true;
 
     kitty.enable = true;
 
