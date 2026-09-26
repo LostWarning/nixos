@@ -16,6 +16,7 @@
     ./mpv.nix
 
     ./nautilus.nix
+    ./nodejs.nix
 
     ./posting.nix
 

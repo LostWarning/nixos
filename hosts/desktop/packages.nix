@@ -6,7 +6,6 @@
     ../../packages/hyprland.nix
     ../../packages/mpd.nix
     ../../packages/neovim.nix
-    ../../packages/npm.nix
     ../../packages/quickshell.nix
     ../../packages/starship.nix
     ../../packages/yazi.nix
@@ -35,6 +34,7 @@
     mpv.enable = true;
 
     nautilus.enable = true;
+    nodejs.enable = true;
 
     swayimg.enable = true;
 
