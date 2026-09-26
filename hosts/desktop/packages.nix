@@ -3,7 +3,6 @@
 {
   imports = [
     ../../packages/antigravity.nix
-    ../../packages/direnv.nix
     ../../packages/googlechrome.nix
     ../../packages/hyprland.nix
     ../../packages/mpd.nix
@@ -23,6 +22,8 @@
   custom.apps = {
     btop.enable = true;
 
+    direnv.enable = true;
+
     fish.enable = true;
 
     git.enable = true;
@@ -32,6 +33,8 @@
     posting.enable = true;
 
     mpv.enable = true;
+
+    nautilus.enable = true;
 
     swayimg.enable = true;
 
@@ -45,6 +48,5 @@
     brightnessctl
     networkmanagerapplet
     blueman
-    nautilus
   ];
 }
