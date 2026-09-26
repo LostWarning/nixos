@@ -2,10 +2,11 @@
 
 {
   imports = [
-    ../packages/fish.nix
     ../packages/fonts.nix
     ../packages/pipewire.nix
   ];
+
+  programs.fish.enable = true;
 
   environment.systemPackages = with pkgs; [
     btrfs-progs

@@ -4,8 +4,6 @@
   imports = [
     ../../packages/antigravity.nix
     ../../packages/direnv.nix
-    ../../packages/fish.nix
-    ../../packages/git.nix
     ../../packages/googlechrome.nix
     ../../packages/hyprland.nix
     ../../packages/kitty.nix
@@ -13,7 +11,6 @@
     ../../packages/mpv.nix
     ../../packages/neovim.nix
     ../../packages/npm.nix
-    ../../packages/posting.nix
     ../../packages/quickshell.nix
     ../../packages/starship.nix
     ../../packages/swayimg.nix
@@ -26,9 +23,19 @@
     ../../packages/ssh.nix
   ];
 
-  custom.apps.btop.enable = true;
-  custom.apps.thunar.enable = true;
+  custom.apps = {
+    btop.enable = true;
 
+    fish.enable = true;
+
+    git.enable = true;
+
+    posting.enable = true;
+
+    thunar.enable = true;
+  };
+
+  # Modules
   myCustom.dev.cpp.enable = true;
 
   home.packages = with pkgs; [
