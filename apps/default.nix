@@ -8,6 +8,8 @@
 
     ./git.nix
 
+    ./kitty.nix
+
     ./mpv.nix
 
     ./posting.nix

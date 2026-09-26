@@ -6,7 +6,6 @@
     ../../packages/direnv.nix
     ../../packages/googlechrome.nix
     ../../packages/hyprland.nix
-    ../../packages/kitty.nix
     ../../packages/mpd.nix
     ../../packages/neovim.nix
     ../../packages/npm.nix
@@ -27,6 +26,8 @@
     fish.enable = true;
 
     git.enable = true;
+
+    kitty.enable = true;
 
     posting.enable = true;
 
