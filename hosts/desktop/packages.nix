@@ -8,7 +8,6 @@
     ../../packages/hyprland.nix
     ../../packages/kitty.nix
     ../../packages/mpd.nix
-    ../../packages/mpv.nix
     ../../packages/neovim.nix
     ../../packages/npm.nix
     ../../packages/quickshell.nix
@@ -30,6 +29,8 @@
     git.enable = true;
 
     posting.enable = true;
+
+    mpv.enable = true;
 
     swayimg.enable = true;
 

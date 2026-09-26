@@ -8,6 +8,8 @@
 
     ./git.nix
 
+    ./mpv.nix
+
     ./posting.nix
 
     ./swayimg.nix
