@@ -7,7 +7,6 @@
     ../../packages/mpd.nix
     ../../packages/neovim.nix
     ../../packages/quickshell.nix
-    ../../packages/starship.nix
     ../../packages/yazi.nix
 
     ../../modules/dev/cpp.nix
@@ -36,6 +35,7 @@
     nautilus.enable = true;
     nodejs.enable = true;
 
+    starship.enable = true;
     swayimg.enable = true;
 
     thunar.enable = true;

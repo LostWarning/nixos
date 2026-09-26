@@ -20,6 +20,7 @@
 
     ./posting.nix
 
+    ./starship.nix
     ./swayimg.nix
 
     ./thunar.nix
