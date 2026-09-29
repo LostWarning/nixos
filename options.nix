@@ -75,23 +75,15 @@
 
       typescript = {
         enable = lib.mkEnableOption "TypeScript/JavaScript development toolchain";
-        runtime = lib.mkOption {
-          type = lib.types.enum [
-            "nodejs"
-            "bun"
-          ];
-          default = "nodejs";
-          description = "Preferred JS runtime";
-        };
-        nodejs = {
-          packageManger = lib.mkOption {
-            type = lib.types.enum [
-              "npm"
-              "pnpm"
-            ];
-            default = "npm";
-            description = "Preferred Node.js package manager";
-          };
+        runtimes = lib.mkOption {
+          type = lib.types.listOf (
+            lib.types.enum [
+              "nodejs"
+              "bun"
+            ]
+          );
+          default = [ "nodejs" ];
+          description = "List of JavaScript runtimes to install globally";
         };
       };
     };

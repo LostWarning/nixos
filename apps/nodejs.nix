@@ -6,7 +6,7 @@
 }:
 
 {
-  home.packages = lib.mkIf (osConfig.custom.dev.typescript.runtime == "nodejs") [
+  home.packages = lib.mkIf (builtins.elem "nodejs" osConfig.custom.dev.typescript.runtimes) [
     pkgs.nodejs
   ];
 }

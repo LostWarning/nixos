@@ -42,7 +42,14 @@
 
   custom.dev = {
     cxx.enable = true;
-    typescript.enable = true;
+
+    typescript = {
+      enable = true;
+      runtimes = [
+        "nodejs"
+        "bun"
+      ];
+    };
   };
 
   # Configure keymap in X11
