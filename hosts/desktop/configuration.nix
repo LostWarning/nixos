@@ -8,7 +8,6 @@
     ../../common/nixos.nix
     ../../common/locale/india.nix
     ../../common/env_variables.nix
-    ../../common/display_manager/greetd.nix
     ../../common/packages.nix
     ../../common/services.nix
 

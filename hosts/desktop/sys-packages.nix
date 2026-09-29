@@ -12,6 +12,7 @@
 
   custom.services = {
     docker.enable = true;
+    greetd.enable = true;
     nginx.enable = true;
     pipewire.enable = true;
     #postgresql.enable = true;
