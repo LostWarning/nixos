@@ -19,7 +19,9 @@
     ./nautilus.nix
     ./nodejs.nix
 
+    ./pavucontrol.nix
     ./posting.nix
+    ./pwvucontrol.nix
 
     ./starship.nix
     ./swayimg/swayimg.nix

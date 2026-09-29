@@ -24,7 +24,9 @@
     git.enable = true;
     google-chrome.enable = true;
 
+    pavucontrol.enable = true;
     posting.enable = true;
+    pwvucontrol.enable = true;
 
     mpv.enable = true;
 

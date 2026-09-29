@@ -1,7 +1,6 @@
 {
   lib,
   config,
-  pkgs,
   ...
 }:
 
@@ -77,11 +76,5 @@
       };
     };
 
-    environment.systemPackages = with pkgs; [
-      wireplumber
-      alsa-utils
-      pwvucontrol
-      pavucontrol
-    ];
   };
 }
