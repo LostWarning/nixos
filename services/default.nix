@@ -7,5 +7,6 @@
     ./nginx.nix
     ./pipewire.nix
     ./postgresql.nix
+    ./steam.nix
   ];
 }

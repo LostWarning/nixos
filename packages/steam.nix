@@ -1,24 +1,11 @@
-{ pkgs, ... }:
+{ ... }:
 
 {
   programs.steam = {
     enable = true;
     gamescopeSession.enable = true;
-    remotePlay.openFirewall = true;
-    dedicatedServer.openFirewall = true;
-    localNetworkGameTransfers.openFirewall = true;
-
-    extraCompatPackages = with pkgs; [
-      proton-ge-bin
-    ];
+    remotePlay.openFirewall = false;
+    dedicatedServer.openFirewall = false;
+    localNetworkGameTransfers.openFirewall = false;
   };
-
-  environment.systemPackages = with pkgs; [
-    steamtinkerlaunch
-    protontricks
-    protonup-ng
-    yad
-    winetricks
-    cabextract
-  ];
 }

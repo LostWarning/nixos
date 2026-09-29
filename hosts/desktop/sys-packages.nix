@@ -3,7 +3,6 @@
 {
   imports = [
     ../../packages/ollama.nix
-    ../../packages/steam.nix
 
     ../../packages/hyprland-system.nix
 
@@ -16,5 +15,6 @@
     nginx.enable = true;
     pipewire.enable = true;
     #postgresql.enable = true;
+    steam.enable = true;
   };
 }
