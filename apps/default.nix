@@ -12,6 +12,8 @@
     ./git.nix
     ./google-chrome.nix
 
+    ./hyprland/hyprland.nix
+
     ./kitty/kitty.nix
 
     ./mpv.nix

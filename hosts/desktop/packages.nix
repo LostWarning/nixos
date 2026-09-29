@@ -3,7 +3,6 @@
 {
   imports = [
     ../../packages/antigravity.nix
-    ../../packages/hyprland.nix
     ../../packages/mpd.nix
     ../../packages/quickshell.nix
     ../../packages/yazi.nix
