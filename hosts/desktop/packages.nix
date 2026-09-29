@@ -5,7 +5,6 @@
     ../../packages/antigravity.nix
     ../../packages/hyprland.nix
     ../../packages/mpd.nix
-    ../../packages/neovim.nix
     ../../packages/quickshell.nix
     ../../packages/yazi.nix
 

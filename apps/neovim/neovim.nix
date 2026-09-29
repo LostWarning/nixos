@@ -1,8 +1,13 @@
-{ pkgs, ... }:
+{
+  osConfig,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
 
-  programs.neovim = {
+  programs.neovim = lib.mkIf osConfig.custom.editors.neovim.enable {
     enable = true;
     defaultEditor = true;
 
@@ -13,21 +18,12 @@
 
     extraPackages = with pkgs; [
 
-      # git
-      git
-
       # Lua
       lua-language-server
       stylua
 
       # nix
       nil
-
-      # C/C++
-      clang-tools
-      clang
-      gnumake
-      cmake
 
       # Telescope Dependencies
       ripgrep
@@ -37,6 +33,6 @@
 
     ];
 
-    initLua = builtins.readFile ./nvim/init.lua;
+    initLua = builtins.readFile ./init.lua;
   };
 }

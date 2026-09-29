@@ -10,7 +10,8 @@
 
     themeFile = "tokyo_night_night";
 
-    shellIntegration.enableFishIntegration = true;
+    shellIntegration.enableFishIntegration = osConfig.custom.terminal.shell == "fish";
+
     extraConfig = builtins.readFile ./kitty.conf;
   };
 }

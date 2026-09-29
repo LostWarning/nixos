@@ -17,6 +17,7 @@
     ./mpv.nix
 
     ./nautilus.nix
+    ./neovim/neovim.nix
     ./nodejs.nix
 
     ./pavucontrol.nix

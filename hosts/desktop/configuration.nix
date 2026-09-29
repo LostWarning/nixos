@@ -33,6 +33,11 @@
     prompt = "starship";
   };
 
+  custom.editors = {
+    neovim.enable = true;
+    default = "neovim";
+  };
+
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
