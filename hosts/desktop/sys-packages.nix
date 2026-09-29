@@ -6,7 +6,6 @@
 
     ../../services
 
-    ../../options.nix
   ];
 
   custom.services = {

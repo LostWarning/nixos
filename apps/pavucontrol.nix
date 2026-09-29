@@ -6,7 +6,7 @@
 }:
 
 {
-  home.packages = lib.mkIf (osConfig.custom.audio.backend == "pipewire") [
+  home.packages = lib.mkIf (osConfig.metronome.audio.backend == "pipewire") [
     pkgs.pavucontrol
   ];
 }

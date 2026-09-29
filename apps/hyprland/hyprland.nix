@@ -6,7 +6,7 @@
 }:
 
 {
-  config = lib.mkIf (osConfig.custom.window_manager == "hyprland") {
+  config = lib.mkIf (osConfig.metronome.window_manager == "hyprland") {
     wayland.windowManager.hyprland = {
       enable = true;
       systemd.enable = false;

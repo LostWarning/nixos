@@ -6,7 +6,7 @@
 }:
 
 {
-  home.packages = lib.mkIf (builtins.elem "nodejs" osConfig.custom.dev.typescript.runtimes) [
+  home.packages = lib.mkIf (builtins.elem "nodejs" osConfig.metronome.dev.typescript.runtimes) [
     pkgs.nodejs
   ];
 }

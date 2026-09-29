@@ -5,10 +5,10 @@
 }:
 
 let
-  fishEnabled = osConfig.custom.terminal.shell == "fish";
+  fishEnabled = osConfig.metronome.terminal.shell == "fish";
 in
 {
-  programs.kitty = lib.mkIf (osConfig.custom.terminal.emulator == "kitty") {
+  programs.kitty = lib.mkIf (osConfig.metronome.terminal.emulator == "kitty") {
     enable = true;
 
     themeFile = "tokyo_night_night";

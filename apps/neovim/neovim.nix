@@ -6,7 +6,7 @@
 }:
 
 {
-  programs.neovim = lib.mkIf osConfig.custom.editors.neovim.enable {
+  programs.neovim = lib.mkIf osConfig.metronome.editors.neovim.enable {
     enable = true;
     defaultEditor = true;
 

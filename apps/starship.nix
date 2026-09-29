@@ -5,7 +5,7 @@
 }:
 
 {
-  programs.starship = lib.mkIf (osConfig.custom.terminal.prompt == "starship") {
+  programs.starship = lib.mkIf (osConfig.metronome.terminal.prompt == "starship") {
     enable = true;
     enableBashIntegration = true;
     enableFishIntegration = true;

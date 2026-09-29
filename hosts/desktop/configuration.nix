@@ -15,7 +15,7 @@
     ./hardware.nix
     ./filesystem.nix
 
-    ../../options.nix
+    ../../modules
 
   ];
 
@@ -25,30 +25,32 @@
 
   networking.hostName = "nixos"; # Define your hostname.
 
-  custom.window_manager = "hyprland";
+  metronome = {
+    window_manager = "hyprland";
 
-  custom.audio.backend = "pipewire";
+    audio.backend = "pipewire";
 
-  custom.terminal = {
-    emulator = "kitty";
-    shell = "fish";
-    prompt = "starship";
-  };
+    terminal = {
+      emulator = "kitty";
+      shell = "fish";
+      prompt = "starship";
+    };
 
-  custom.editors = {
-    neovim.enable = true;
-    default = "neovim";
-  };
+    editors = {
+      neovim.enable = true;
+      default = "neovim";
+    };
 
-  custom.dev = {
-    cxx.enable = true;
+    dev = {
+      cxx.enable = true;
 
-    typescript = {
-      enable = true;
-      runtimes = [
-        "nodejs"
-        "bun"
-      ];
+      typescript = {
+        enable = true;
+        runtimes = [
+          "nodejs"
+          "bun"
+        ];
+      };
     };
   };
 

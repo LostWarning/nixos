@@ -5,7 +5,7 @@
 }:
 
 {
-  config = lib.mkIf (config.custom.audio.backend == "pipewire") {
+  config = lib.mkIf (config.metronome.audio.backend == "pipewire") {
 
     services.pulseaudio.enable = false;
 

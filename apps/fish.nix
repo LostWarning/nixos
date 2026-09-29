@@ -5,7 +5,7 @@
 }:
 
 {
-  programs.fish = lib.mkIf (osConfig.custom.terminal.shell == "fish") {
+  programs.fish = lib.mkIf (osConfig.metronome.terminal.shell == "fish") {
     enable = true;
 
     interactiveShellInit = ''

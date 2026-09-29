@@ -6,7 +6,7 @@
 }:
 
 {
-  config = lib.mkIf (config.custom.window_manager == "hyprland") {
+  config = lib.mkIf (config.metronome.window_manager == "hyprland") {
     # Core Hyprland compositor
     programs.hyprland = {
       enable = true;
