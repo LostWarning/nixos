@@ -3,7 +3,6 @@
 {
   imports = [
     ../packages/fonts.nix
-    ../packages/pipewire.nix
   ];
 
   programs.fish.enable = true;

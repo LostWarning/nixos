@@ -6,7 +6,6 @@
     ./ssh-key.nix
   ];
   # Audio, Security, and Privileges
-  security.rtkit.enable = true;
   security.polkit.enable = true;
 
   # Storage, Mounting, and File Managers Support
