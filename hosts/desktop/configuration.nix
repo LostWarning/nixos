@@ -25,6 +25,8 @@
 
   networking.hostName = "nixos"; # Define your hostname.
 
+  custom.window_manager = "hyprland";
+
   custom.audio.backend = "pipewire";
 
   custom.terminal = {

@@ -4,8 +4,6 @@
   imports = [
     ../../packages/ollama.nix
 
-    ../../packages/hyprland-system.nix
-
     ../../services
 
     ../../options.nix
