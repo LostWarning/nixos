@@ -1,20 +1,16 @@
 {
-  config,
+  osConfig,
   lib,
   ...
 }:
 
 {
-  options.custom.apps.kitty.enable = lib.mkEnableOption "kitty";
+  programs.kitty = lib.mkIf (osConfig.custom.terminal.emulator == "kitty") {
+    enable = true;
 
-  config = lib.mkIf config.custom.apps.kitty.enable {
-    programs.kitty = {
-      enable = true;
+    themeFile = "tokyo_night_night";
 
-      themeFile = "tokyo_night_night";
-
-      shellIntegration.enableFishIntegration = true;
-      extraConfig = builtins.readFile ./kitty.conf;
-    };
+    shellIntegration.enableFishIntegration = true;
+    extraConfig = builtins.readFile ./kitty.conf;
   };
 }

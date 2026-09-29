@@ -1,17 +1,13 @@
 {
-  config,
+  osConfig,
   lib,
   pkgs,
   ...
 }:
 
 {
-  options.custom.apps.pwvucontrol.enable = lib.mkEnableOption "pwvucontrol";
+  home.packages = lib.mkIf (osConfig.custom.audio.backend == "pipewire") [
+    pkgs.pwvucontrol
+  ];
 
-  config = lib.mkIf config.custom.apps.pwvucontrol.enable {
-
-    home.packages = with pkgs; [
-      pwvucontrol
-    ];
-  };
 }

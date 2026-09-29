@@ -7,14 +7,14 @@
     ../../packages/hyprland-system.nix
 
     ../../services
+
+    ../../options.nix
   ];
 
   custom.services = {
     docker.enable = true;
     greetd.enable = true;
     nginx.enable = true;
-    pipewire.enable = true;
-    #postgresql.enable = true;
     steam.enable = true;
   };
 }

@@ -5,9 +5,7 @@
 }:
 
 {
-  options.custom.services.pipewire.enable = lib.mkEnableOption "pipewire";
-
-  config = lib.mkIf config.custom.services.pipewire.enable {
+  config = lib.mkIf (config.custom.audio.backend == "pipewire") {
 
     services.pulseaudio.enable = false;
 

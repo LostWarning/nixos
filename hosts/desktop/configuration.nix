@@ -15,6 +15,8 @@
     ./hardware.nix
     ./filesystem.nix
 
+    ../../options.nix
+
   ];
 
   nixpkgs.config.allowUnfree = true;
@@ -22,6 +24,14 @@
   services.dbus.implementation = "broker";
 
   networking.hostName = "nixos"; # Define your hostname.
+
+  custom.audio.backend = "pipewire";
+
+  custom.terminal = {
+    emulator = "kitty";
+    shell = "fish";
+    prompt = "starship";
+  };
 
   # Configure keymap in X11
   services.xserver.xkb = {

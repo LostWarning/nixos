@@ -10,7 +10,6 @@
     ../../packages/yazi.nix
 
     ../../apps
-    ../../modules
 
     ../../packages/ssh.nix
   ];
@@ -24,9 +23,7 @@
     git.enable = true;
     google-chrome.enable = true;
 
-    pavucontrol.enable = true;
     posting.enable = true;
-    pwvucontrol.enable = true;
 
     mpv.enable = true;
 
@@ -36,13 +33,6 @@
     swayimg.enable = true;
 
     thunar.enable = true;
-  };
-
-  # Modules
-  myCustom.dev.cpp.enable = true;
-
-  custom.modules = {
-    terminal.enable = true;
   };
 
   home.packages = with pkgs; [
