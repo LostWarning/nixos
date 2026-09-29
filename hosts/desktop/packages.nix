@@ -17,6 +17,7 @@
 
   custom.apps = {
     btop.enable = true;
+    bun.enable = true;
 
     direnv.enable = true;
 

@@ -3,6 +3,7 @@
 {
   imports = [
     ./btop.nix
+    ./bun.nix
 
     ./direnv.nix
 
@@ -11,7 +12,7 @@
     ./git.nix
     ./google-chrome.nix
 
-    ./kitty.nix
+    ./kitty/kitty.nix
 
     ./mpv.nix
 
@@ -21,7 +22,7 @@
     ./posting.nix
 
     ./starship.nix
-    ./swayimg.nix
+    ./swayimg/swayimg.nix
 
     ./thunar.nix
   ];

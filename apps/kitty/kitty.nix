@@ -14,7 +14,7 @@
       themeFile = "tokyo_night_night";
 
       shellIntegration.enableFishIntegration = true;
-      extraConfig = builtins.readFile ./config/kitty/kitty.conf;
+      extraConfig = builtins.readFile ./kitty.conf;
     };
   };
 }

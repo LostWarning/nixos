@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ ... }:
 
 {
   imports = [
@@ -7,7 +7,12 @@
     ../../packages/steam.nix
 
     ../../packages/hyprland-system.nix
+
+    ../../services
   ];
 
-  environment.systemPackages = with pkgs; [ ];
+  custom.services = {
+    docker.enable = true;
+    #postgresql.enable = true;
+  };
 }
