@@ -1,13 +1,11 @@
 {
-  config,
+  osConfig,
   lib,
   ...
 }:
 
 {
-  options.custom.apps.bun.enable = lib.mkEnableOption "bun";
-
-  config = lib.mkIf config.custom.apps.bun.enable {
+  config = lib.mkIf (osConfig.custom.dev.typescript.runtime == "bun") {
     programs.bun = {
       enable = true;
     };

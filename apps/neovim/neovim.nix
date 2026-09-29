@@ -6,7 +6,6 @@
 }:
 
 {
-
   programs.neovim = lib.mkIf osConfig.custom.editors.neovim.enable {
     enable = true;
     defaultEditor = true;

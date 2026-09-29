@@ -1,16 +1,12 @@
 {
-  config,
+  osConfig,
   lib,
   pkgs,
   ...
 }:
 
 {
-  options.custom.apps.nodejs.enable = lib.mkEnableOption "nodejs";
-
-  config = lib.mkIf config.custom.apps.nodejs.enable {
-    home.packages = with pkgs; [
-      nodejs
-    ];
-  };
+  home.packages = lib.mkIf (osConfig.custom.dev.typescript.runtime == "nodejs") [
+    pkgs.nodejs
+  ];
 }

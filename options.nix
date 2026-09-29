@@ -69,5 +69,31 @@
         description = "Default editor";
       };
     };
+
+    dev = {
+      cxx.enable = lib.mkEnableOption "C++ development toolchain";
+
+      typescript = {
+        enable = lib.mkEnableOption "TypeScript/JavaScript development toolchain";
+        runtime = lib.mkOption {
+          type = lib.types.enum [
+            "nodejs"
+            "bun"
+          ];
+          default = "nodejs";
+          description = "Preferred JS runtime";
+        };
+        nodejs = {
+          packageManger = lib.mkOption {
+            type = lib.types.enum [
+              "npm"
+              "pnpm"
+            ];
+            default = "npm";
+            description = "Preferred Node.js package manager";
+          };
+        };
+      };
+    };
   };
 }

@@ -14,7 +14,6 @@
 
   custom.apps = {
     btop.enable = true;
-    bun.enable = true;
 
     direnv.enable = true;
 
@@ -26,7 +25,6 @@
     mpv.enable = true;
 
     nautilus.enable = true;
-    nodejs.enable = true;
 
     swayimg.enable = true;
 
