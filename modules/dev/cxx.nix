@@ -32,7 +32,7 @@
       };
 
       diagnostics = lib.mkOption {
-        type = lib.type.listOf (
+        type = lib.types.listOf (
           lib.types.enum [
             "gdb"
             "lldb"
@@ -49,11 +49,10 @@
       };
 
       libraries = lib.mkOption {
-        type = lib.types.listOf lib.type.str;
+        type = lib.types.listOf lib.types.str;
         default = [ ];
         description = "Development libraries and headers (e.g., liburing)";
       };
     };
-
   };
 }
