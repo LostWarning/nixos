@@ -4,48 +4,47 @@
   options.metronome.dev = {
     cxx = {
       enable = lib.mkEnableOption "C++ development toolchain";
-      toolchain = lib.mkOption {
-        type = lib.types.listOf (
-          lib.types.enum [
-            "gcc"
-            "clang"
-          ]
-        );
-        default = [ "clang" ];
-        description = "List of c/cxx toolchains provider";
+
+      compilers = {
+        clang.enable = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Clang/LLVM C/C++ compiler";
+        };
+        gcc.enable = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "GCC C/C++ compiler";
+        };
       };
 
-      buildSystems = lib.mkOption {
-        type = lib.types.listOf (
-          lib.types.enum [
-            "cmake"
-            "ninja"
-            "make"
-            "meson"
-          ]
-        );
-        default = [
-          "cmake"
-          "ninja"
-        ];
-        description = "Build systems";
+      build_systems = {
+        cmake.enable = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "CMake build system";
+        };
+        ninja.enable = lib.mkOption {
+          type = lib.type.bool;
+          default = true;
+          description = "Ninja build tool";
+        };
+        meson.enable = lib.mkOption {
+          type = lib.type.bool;
+          default = false;
+          description = "Meson build tool";
+        };
+        make.enable = lib.mkOption {
+          type = lib.type.bool;
+          default = true;
+          description = "Make build tools";
+        };
       };
 
-      diagnostics = lib.mkOption {
-        type = lib.types.listOf (
-          lib.types.enum [
-            "gdb"
-            "lldb"
-            "valgrind"
-            "strace"
-            "perf"
-          ]
-        );
-        default = [
-          "gdb"
-          "valgrind"
-        ];
-        description = "Debugger, profilers and system tracers";
+      diagnostics = {
+        gdb.enable = lib.mkEnableOption "GDB debugger";
+        lldb.enable = lib.mkEnableOption "LLDB debugger";
+        valgrind.enable = lib.mkEnableOption "Valgrind memory debugger";
       };
 
       libraries = lib.mkOption {

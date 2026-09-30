@@ -46,10 +46,10 @@
 
       typescript = {
         enable = true;
-        runtimes = [
-          "nodejs"
-          "bun"
-        ];
+        runtimes = {
+          nodejs.enable = true;
+          bun.enable = true;
+        };
       };
     };
   };
