@@ -11,7 +11,8 @@
     ../../common/packages.nix
     ../../common/services.nix
 
-    ./sys-packages.nix
+    ../../services
+
     ./hardware.nix
     ./filesystem.nix
 

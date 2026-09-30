@@ -5,8 +5,6 @@
   imports = [
     ./ssh-key.nix
   ];
-  # Audio, Security, and Privileges
-  security.polkit.enable = true;
 
   # Storage, Mounting, and File Managers Support
   services.gvfs.enable = true;
