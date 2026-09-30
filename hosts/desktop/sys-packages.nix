@@ -8,7 +8,4 @@
 
   ];
 
-  custom.services = {
-    docker.enable = true;
-  };
 }

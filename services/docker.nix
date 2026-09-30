@@ -5,10 +5,12 @@
   ...
 }:
 
+let
+  containers = config.metronome.containers;
+in
 {
-  options.custom.services.docker.enable = lib.mkEnableOption "docker";
 
-  config = lib.mkIf config.custom.services.docker.enable {
+  config = lib.mkIf (containers.enable && containers.docker.enable) {
     virtualisation.docker.enable = true;
 
     users.users.${username}.extraGroups = [ "docker" ];

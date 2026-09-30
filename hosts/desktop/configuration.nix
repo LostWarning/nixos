@@ -60,6 +60,11 @@
       };
     };
 
+    containers = {
+      enable = true;
+      docker.enable = true;
+    };
+
     games = {
       enable = true;
       steam.enable = true;

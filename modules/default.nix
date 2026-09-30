@@ -6,6 +6,7 @@
     ./networking
 
     ./audio.nix
+    ./containers.nix
     ./display-manager.nix
     ./editor.nix
     ./games.nix
