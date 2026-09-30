@@ -1,9 +1,10 @@
 { lib, config, ... }:
 
+let
+  http_server = config.metronome.networking.http_server;
+in
 {
-  options.custom.services.nginx.enable = lib.mkEnableOption "nginx";
-
-  config = lib.mkIf config.custom.services.nginx.enable {
+  config = lib.mkIf (http_server.enable && http_server.backend == "nginx") {
 
     services.nginx = {
       enable = true;

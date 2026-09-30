@@ -43,6 +43,13 @@
       default = "neovim";
     };
 
+    networking = {
+      http_server = {
+        enable = true;
+        backend = "nginx";
+      };
+    };
+
     dev = {
       cxx.enable = true;
 

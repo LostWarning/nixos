@@ -3,6 +3,7 @@
 {
   imports = [
     ./dev
+    ./networking
 
     ./audio.nix
     ./display-manager.nix

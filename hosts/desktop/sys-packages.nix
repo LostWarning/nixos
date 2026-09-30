@@ -10,7 +10,6 @@
 
   custom.services = {
     docker.enable = true;
-    nginx.enable = true;
     steam.enable = true;
   };
 }
