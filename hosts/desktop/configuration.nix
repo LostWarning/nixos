@@ -26,6 +26,8 @@
   networking.hostName = "nixos"; # Define your hostname.
 
   metronome = {
+    display_manager = "greetd";
+
     window_manager = "hyprland";
 
     audio.backend = "pipewire";

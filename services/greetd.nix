@@ -6,9 +6,8 @@
 }:
 
 {
-  options.custom.services.greetd.enable = lib.mkEnableOption "greetd";
 
-  config = lib.mkIf config.custom.services.greetd.enable {
+  config = lib.mkIf (config.metronome.display_manager == "greetd") {
 
     services.greetd = {
       enable = true;
