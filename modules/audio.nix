@@ -1,8 +1,8 @@
 { lib, ... }:
 
 {
-  options.metronome = {
-    audio.backend = lib.mkOption {
+  options.metronome.audio = {
+    backend = lib.mkOption {
       type = lib.types.enum [
         "pipewire"
         "none"

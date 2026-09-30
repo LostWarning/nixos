@@ -10,6 +10,5 @@
 
   custom.services = {
     docker.enable = true;
-    steam.enable = true;
   };
 }
