@@ -65,6 +65,13 @@
       docker.enable = true;
     };
 
+    ai = {
+      enable = true;
+      engine = {
+        ollama.enable = true;
+      };
+    };
+
     games = {
       enable = true;
       steam.enable = true;

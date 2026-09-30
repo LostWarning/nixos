@@ -5,6 +5,7 @@
     ./dev
     ./networking
 
+    ./ai.nix
     ./audio.nix
     ./containers.nix
     ./display-manager.nix
