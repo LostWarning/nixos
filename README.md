@@ -46,9 +46,16 @@ flowchart TD
 ├── modules/                           # Metronome schema definitions (options.metronome.*)
 │   ├── default.nix                    # Module aggregation entry point
 │   ├── window_manager.nix             # Window manager selection (hyprland, gnome, kde, none)
+│   ├── display-manager.nix            # Display manager selection (greetd, sddm, none)
 │   ├── audio.nix                      # Audio backend selection (pipewire, none)
 │   ├── terminal.nix                   # Terminal emulator, shell, and prompt options
 │   ├── editor.nix                     # Editor preferences (neovim, vim, nano)
+│   ├── ai.nix                         # AI & LLM engine capabilities
+│   ├── containers.nix                 # Container runtime configurations
+│   ├── games.nix                      # Gaming and hardware integration options
+│   ├── networking/                    # Network daemons and proxies
+│   │   ├── default.nix
+│   │   └── http-server.nix            # HTTP server selection (nginx, apache)
 │   └── dev/                           # Development toolchain taxonomies
 │       ├── default.nix                # Dev modules aggregator
 │       ├── typescript.nix             # TypeScript/JavaScript runtimes (nodejs, bun)
@@ -67,6 +74,7 @@ flowchart TD
 │   ├── greetd.nix                     # Lightweight tuigreet display manager
 │   ├── docker.nix                     # Container runtime daemon
 │   ├── nginx.nix                      # Web server daemon
+│   ├── ollama.nix                     # Ollama LLM inference service
 │   ├── postgresql.nix                 # Relational database service
 │   └── steam.nix                      # Steam hardware integration & firewall rules
 │
@@ -121,6 +129,7 @@ Machines are configured by declaring their functional classification under `metr
 # hosts/desktop/configuration.nix
 metronome = {
   window_manager = "hyprland";
+  display_manager = "greetd";
 
   audio.backend = "pipewire";
 
@@ -142,6 +151,24 @@ metronome = {
       runtimes = [ "nodejs" "bun" ];
     };
   };
+
+  containers.enable = true;
+  containers.docker.enable = true;
+
+  networking.http_server = {
+    enable = true;
+    backend = "nginx";
+  };
+
+  ai = {
+    enable = true;
+    engine.ollama.enable = true;
+  };
+
+  games = {
+    enable = true;
+    steam.enable = true;
+  };
 };
 ```
 
@@ -151,6 +178,7 @@ Because Metronome isolates capabilities, configuring a simple, bloat-free system
 # hosts/laptop/configuration.nix
 metronome = {
   window_manager = "gnome";            # Stable, familiar desktop
+  display_manager = "sddm";
 
   terminal = {
     emulator = "none";                 # Uses GNOME Terminal defaults
@@ -167,6 +195,11 @@ metronome = {
     cxx.enable = false;                # Zero compilers or debuggers installed
     typescript.enable = false;         # No Node.js / Bun
   };
+
+  containers.enable = false;           # No Docker
+  networking.http_server.enable = false;
+  ai.enable = false;                   # No LLM engines
+  games.enable = false;                # No gaming dependencies
 };
 ```
 
