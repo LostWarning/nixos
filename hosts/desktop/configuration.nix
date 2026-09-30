@@ -48,10 +48,8 @@
 
       typescript = {
         enable = true;
-        runtimes = {
-          nodejs.enable = true;
-          bun.enable = true;
-        };
+        nodejs.enable = true;
+        bun.enable = true;
       };
     };
   };

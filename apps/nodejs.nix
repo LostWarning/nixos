@@ -8,7 +8,7 @@ let
   typescript = osConfig.metronome.dev.typescript;
 in
 {
-  home.packages = lib.mkIf (typescript.enable && typescript.runtimes.nodejs.enable) [
+  home.packages = lib.mkIf (typescript.enable && typescript.nodejs.enable) [
     pkgs.nodejs
   ];
 }
