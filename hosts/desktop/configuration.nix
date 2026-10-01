@@ -16,6 +16,7 @@
 
     ./hardware.nix
     ./filesystem.nix
+    ./fonts.nix
 
     ../../modules
 
