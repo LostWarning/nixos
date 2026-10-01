@@ -1,4 +1,5 @@
 {
+  pkgs,
   ...
 }:
 
@@ -20,9 +21,9 @@
 
   ];
 
-  nixpkgs.config.allowUnfree = true;
+  boot.kernelPackages = pkgs.linuxPackages_zen;
 
-  services.dbus.implementation = "broker";
+  nixpkgs.config.allowUnfree = true;
 
   networking.hostName = "nixos"; # Define your hostname.
 
@@ -42,6 +43,10 @@
     editors = {
       neovim.enable = true;
       default = "neovim";
+    };
+
+    file_explorer = {
+      nautilus.enable = true;
     };
 
     networking = {

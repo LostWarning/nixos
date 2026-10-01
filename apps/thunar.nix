@@ -1,19 +1,18 @@
 {
-  config,
+  osConfig,
   lib,
   pkgs,
   ...
 }:
 
+let
+  file_explorer = osConfig.metronome.file_explorer;
+in
 {
-  options.custom.apps.thunar.enable = lib.mkEnableOption "Thunar";
-
-  config = lib.mkIf config.custom.apps.thunar.enable {
-    home.packages = with pkgs; [
-      thunar
-      thunar-archive-plugin # For right-click extract/compress
-      thunar-volman # For automatic management of removable drives
-      file-roller # Archive backend manager for Thunar
-    ];
-  };
+  home.packages = lib.mkIf file_explorer.thunar.enable [
+    pkgs.thunar
+    pkgs.thunar-archive-plugin # For right-click extract/compress
+    pkgs.thunar-volman # For automatic management of removable drives
+    pkgs.file-roller # Archive backend manager for Thunar
+  ];
 }

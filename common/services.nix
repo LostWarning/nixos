@@ -11,8 +11,12 @@
   services.udisks2.enable = true;
   services.tumbler.enable = true;
 
-  # Hardware, Networking, and Peripherals
+  # D-Bus broker implementation
+  services.dbus.implementation = "broker";
+
+  # Enable networking
   networking.networkmanager.enable = true;
+
   # hardware.bluetooth.enable = true;
   # services.blueman.enable = true; # Optional GUI Bluetooth manager
   # services.printing.enable = true;

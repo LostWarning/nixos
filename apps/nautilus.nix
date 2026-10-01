@@ -1,16 +1,15 @@
 {
-  config,
+  osConfig,
   lib,
   pkgs,
   ...
 }:
 
+let
+  file_explorer = osConfig.metronome.file_explorer;
+in
 {
-  options.custom.apps.nautilus.enable = lib.mkEnableOption "Nautilus";
-
-  config = lib.mkIf config.custom.apps.nautilus.enable {
-    home.packages = with pkgs; [
-      nautilus
-    ];
-  };
+  home.packages = lib.mkIf file_explorer.nautilus.enable [
+    pkgs.nautilus
+  ];
 }
