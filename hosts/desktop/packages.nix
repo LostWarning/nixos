@@ -13,6 +13,8 @@ in
     ../../apps
 
     ../../packages/ssh.nix
+
+    ./theme.nix
   ];
 
   custom.apps = {
@@ -37,28 +39,6 @@ in
     blueman
     papirus-icon-theme
   ];
-
-  gtk = {
-    enable = true;
-    theme = {
-      name = "Adwaita-dark";
-      package = pkgs.gnome-themes-extra;
-    };
-    iconTheme = {
-      name = "Papirus-Dark";
-      package = pkgs.papirus-icon-theme;
-    };
-  };
-
-  dconf.settings = {
-    "org/gnome/desktop/interface" = {
-      color-scheme = "prefer-dark";
-    };
-    "org/gnome/nautilus/preferences" = {
-      default-folder-viewer = "icon-view";
-      sort-directories-first = true;
-    };
-  };
 
   xdg.configFile."pipewire/pipewire.conf.d/99-system.conf" =
     lib.mkIf (builtins.pathExists pipewireConfigFile)
