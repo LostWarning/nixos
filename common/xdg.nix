@@ -13,4 +13,20 @@
     templates = "${config.home.homeDirectory}/Templates";
     videos = "${config.home.homeDirectory}/Videos";
   };
+
+  xdg.desktopEntries.nvim = {
+    name = "Neovim";
+
+    exec = "kitty -e nvim %F";
+    terminal = false;
+    type = "Application";
+    categories = [
+      "Utility"
+      "TextEditor"
+    ];
+    mimeType = [
+      "text/plain"
+      "application/x-zerosize"
+    ];
+  };
 }

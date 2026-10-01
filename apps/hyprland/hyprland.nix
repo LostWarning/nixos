@@ -10,9 +10,10 @@
     wayland.windowManager.hyprland = {
       enable = true;
       systemd.enable = false;
-
-      extraConfig = builtins.readFile ./hyprland.lua;
     };
+
+    xdg.configFile."hypr/hyprland.lua".source = ./hyprland.lua;
+    xdg.configFile."hypr/monitors.lua".source = ../../hosts/desktop/monitors.lua;
 
     home.packages = with pkgs; [
       hyprcursor

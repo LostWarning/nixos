@@ -21,24 +21,8 @@
 ------------------
 
 -- See https://wiki.hypr.land/Configuring/Basics/Monitors/
-hl.monitor({
-	output = "DP-1",
-	mode = "3840x2160@120",
-	position = "1080x0",
-	scale = 1.5,
-	vrr = 2,
-	bitdepth = 10,
-	cm = "auto",
-})
-hl.monitor({
-	output = "DP-2",
-	mode = "1920x1080@60",
-	position = "0x0",
-	scale = 1.0,
-	cm = "auto",
-	bitdepth = 8,
-	transform = 3,
-})
+
+require("monitors")
 
 hl.config({
 	workspace = {
@@ -426,26 +410,26 @@ hl.window_rule({
 })
 
 -- Force Steam Big Picture Mode to float, fullscreen, and retain focus
-hl.window_rule({
-	name = "steam-bigpicture-fs",
-	match = {
-		title = "^Steam Big Picture Mode$",
-	},
-	float = true,
-	fullscreen = true,
-	stay_focused = true,
-})
+-- hl.window_rule({
+--	name = "steam-bigpicture-fs",
+--	match = {
+--		title = "^Steam Big Picture Mode$",
+--	},
+--	float = true,
+--	fullscreen = true,
+--	stay_focused = true,
+--})
 
 -- Prevent auxiliary Steam sub-windows from aggressively tiling
-hl.window_rule({
-	name = "steam-subwindows-float",
-	match = {
-		class = "^steam$",
-		title = "^(Friends List|Steam - News|Settings)$",
-	},
-	float = true,
-})
+--hl.window_rule({
+--	name = "steam-subwindows-float",
+--	match = {
+--		class = "^steam$",
+--		title = "^(Friends List|Steam - News|Settings)$",
+--	},
+--	float = true,
+--})
 
 render = {
-	direct_scanout = 0, -- 0: disabled, 1: enabled, 2: fullscreen only
+	direct_scanout = 2, -- 0: disabled, 1: enabled, 2: fullscreen only
 }
