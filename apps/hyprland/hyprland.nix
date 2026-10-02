@@ -5,6 +5,10 @@
   ...
 }:
 
+let
+  targetHost = osConfig.networking.hostName;
+in
+
 {
   config = lib.mkIf (osConfig.metronome.window_manager == "hyprland") {
     wayland.windowManager.hyprland = {
@@ -13,7 +17,7 @@
     };
 
     xdg.configFile."hypr/hyprland.lua".source = ./hyprland.lua;
-    xdg.configFile."hypr/monitors.lua".source = ../../hosts/desktop/monitors.lua;
+    xdg.configFile."hypr/monitors.lua".source = ../../hosts/thinkpad-p16-gen2/monitors.lua;
 
     home.packages = with pkgs; [
       hyprcursor
