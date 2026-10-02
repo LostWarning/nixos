@@ -1,3 +1,4 @@
+# WORK IN PROGRESS
 # ⏱️ Metronome — Modular NixOS & Home Manager Configuration
 
 A clean, declarative, and hierarchical NixOS configuration powered by **Flakes** and **Home Manager**.
