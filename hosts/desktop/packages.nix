@@ -8,7 +8,6 @@ in
     ../../packages/antigravity.nix
     ../../packages/mpd.nix
     ../../packages/quickshell.nix
-    ../../packages/yazi.nix
 
     ../../apps
 
