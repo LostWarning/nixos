@@ -44,7 +44,7 @@ hl.config({
 
 -- Set programs that you use
 local terminal = "kitty"
-local fileManager = "kitty -e yazi /home/stranger"
+local fileManager = "nautilus"
 local webBrowser = "google-chrome"
 local menu = "hyprlauncher"
 
@@ -254,7 +254,7 @@ hl.config({
 		sensitivity = 0, -- -1.0 - 1.0, 0 means no modification.
 
 		touchpad = {
-			natural_scroll = false,
+			natural_scroll = true,
 		},
 	},
 })
