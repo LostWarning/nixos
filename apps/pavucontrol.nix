@@ -1,12 +1,26 @@
 {
-  osConfig,
+  config,
   lib,
   pkgs,
+  username,
   ...
 }:
-
+let
+  cfg = config.metronome.apps.pavucontrol;
+in
 {
-  home.packages = lib.mkIf (osConfig.metronome.audio.backend == "pipewire") [
-    pkgs.pavucontrol
-  ];
+
+  options.metronome.apps.pavucontrol = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "install pavucontrol";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    home-manager.users.${username} = {
+      home.packages = [ pkgs.pavucontrol ];
+    };
+  };
 }

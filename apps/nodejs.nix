@@ -1,14 +1,25 @@
 {
-  osConfig,
+  config,
   lib,
   pkgs,
+  username,
   ...
 }:
 let
-  typescript = osConfig.metronome.dev.typescript;
+  cfg = config.metronome.apps.nodejs;
 in
 {
-  home.packages = lib.mkIf (typescript.enable && typescript.nodejs.enable) [
-    pkgs.nodejs
-  ];
+  options.metronome.apps.nodejs = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Install nodejs";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    home-manager.users.${username} = {
+      home.packages = [ pkgs.nodejs ];
+    };
+  };
 }

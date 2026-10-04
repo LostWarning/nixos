@@ -1,18 +1,44 @@
 {
   config,
   lib,
+  username,
   ...
 }:
 
+let
+  cfg = config.metronome.apps.btop;
+  isDefault = (config.metronome.defaults.system_monitor == "btop");
+in
 {
-  options.custom.apps.btop.enable = lib.mkEnableOption "Btop";
+  options.metronome.apps.btop = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = isDefault;
+      description = "Enable btop system monitor";
+    };
 
-  config = lib.mkIf config.custom.apps.btop.enable {
-    programs.btop = {
-      enable = true;
-      settings = {
-        color_theme = "tokyo-night";
-        theme_background = false;
+    color_theme = lib.mkOption {
+      type = lib.types.enum [
+        "tokyo-night"
+      ];
+      default = "tokyo-night";
+      description = "Color theme";
+    };
+    theme_background = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Use themes background";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    home-manager.users.${username} = {
+      programs.btop = {
+        enable = true;
+        settings = {
+          color_theme = cfg.color_theme;
+          theme_background = cfg.theme_background;
+        };
       };
     };
   };

@@ -1,18 +1,30 @@
 {
   config,
   lib,
+  username,
   ...
 }:
 
+let
+  cfg = config.metronome.apps.direnv;
+in
 {
-  options.custom.apps.direnv.enable = lib.mkEnableOption "direnv";
+  options.metronome.apps.direnv = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable direnv";
+    };
+  };
 
-  config = lib.mkIf config.custom.apps.direnv.enable {
-    programs.direnv = {
-      enable = true;
-      enableBashIntegration = true;
-      enableFishIntegration = true;
-      nix-direnv.enable = true;
+  config = lib.mkIf cfg.enable {
+    home-manager.users.${username} = {
+      programs.direnv = {
+        enable = true;
+        enableBashIntegration = true;
+        enableFishIntegration = true;
+        nix-direnv.enable = true;
+      };
     };
   };
 }

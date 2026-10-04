@@ -17,14 +17,8 @@ in
   ];
 
   custom.apps = {
-    btop.enable = true;
-
-    direnv.enable = true;
 
     git.enable = true;
-    google-chrome.enable = true;
-
-    posting.enable = true;
 
     mpv.enable = true;
 

@@ -2,7 +2,6 @@
 
 {
   imports = [
-    ./dev
     ./networking
 
     ./ai.nix

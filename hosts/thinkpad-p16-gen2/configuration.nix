@@ -19,6 +19,18 @@
 
     ../../modules
 
+    ../../apps/bun.nix
+    ../../apps/btop.nix
+    ../../apps/direnv.nix
+    ../../apps/google-chrome.nix
+    ../../apps/nautilus.nix
+    ../../apps/nodejs.nix
+    ../../apps/pavucontrol.nix
+    ../../apps/posting.nix
+    ../../apps/pwvucontrol.nix
+
+    ../../modules/defaults.nix
+
   ];
 
   hardware.graphics = {
@@ -36,6 +48,22 @@
   networking.hostName = "thinkpad-p16-gen2"; # Define your hostname.
 
   metronome = {
+
+    defaults = {
+      file-explorer = "nautilus";
+      system_monitor = "btop";
+      web-browser = "google-chrome";
+    };
+
+    apps = {
+      bun.enable = true;
+      direnv.enable = true;
+      nodejs.enable = true;
+      pavucontrol.enable = true;
+      posting.enable = true;
+      pwvucontrol.enable = true;
+    };
+
     display_manager = "greetd";
 
     window_manager = "hyprland";
@@ -53,24 +81,10 @@
       default = "neovim";
     };
 
-    file_explorer = {
-      nautilus.enable = true;
-    };
-
     networking = {
       http_server = {
         enable = true;
         backend = "nginx";
-      };
-    };
-
-    dev = {
-      cxx.enable = true;
-
-      typescript = {
-        enable = true;
-        nodejs.enable = true;
-        bun.enable = true;
       };
     };
 

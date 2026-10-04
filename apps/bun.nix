@@ -1,15 +1,26 @@
 {
-  osConfig,
+  config,
   lib,
+  username,
   ...
 }:
 let
-  typescript = osConfig.metronome.dev.typescript;
+  cfg = config.metronome.apps.bun;
 in
 {
-  config = lib.mkIf (typescript.enable && typescript.bun.enable) {
-    programs.bun = {
-      enable = true;
+  options.metronome.apps.bun = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "install bun";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    home-manager.users.${username} = {
+      programs.bun = {
+        enable = true;
+      };
     };
   };
 }
