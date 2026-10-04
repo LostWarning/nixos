@@ -14,7 +14,7 @@
 
     ../../services
 
-    ./hardware.nix
+    ../../hardware/laptop/thinkpad/p16-gen2.nix
     ./fonts.nix
 
     ../../modules

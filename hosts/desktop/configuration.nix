@@ -14,7 +14,7 @@
 
     ../../services
 
-    ./hardware.nix
+    ../../hardware/gpu/radeon.nix
     ./filesystem.nix
     ./fonts.nix
 
