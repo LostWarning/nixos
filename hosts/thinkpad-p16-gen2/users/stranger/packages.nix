@@ -9,11 +9,14 @@
   metronome = {
     profiles = {
       desktops.hyprland.enable = true;
+      dev = {
+        cpp.enable = true;
+        node.enable = true;
+      };
     };
 
     apps = {
       antigravity.enable = true;
-      bun.enable = true;
       direnv.enable = true;
 
       git = {
@@ -24,7 +27,6 @@
 
       mpd.enable = true;
       mpv.enable = true;
-      nodejs.enable = true;
       posting.enable = true;
     };
   };

@@ -11,6 +11,7 @@
     ./antigravity.nix
     ./btop.nix
     ./bun.nix
+    ./cpp.nix
     ./direnv.nix
     ./git.nix
     ./google-chrome.nix
