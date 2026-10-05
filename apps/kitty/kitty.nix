@@ -1,20 +1,40 @@
 {
-  osConfig,
+  config,
   lib,
   ...
 }:
 
 let
-  fishEnabled = osConfig.metronome.terminal.shell == "fish";
+  cfg = config.metronome.apps.kitty;
+  isDefault = (config.metronome.defaults.terminal == "kitty");
+  isFishEnabled = (config.metronome.defaults.shell == "fish");
 in
 {
-  programs.kitty = lib.mkIf (osConfig.metronome.terminal.emulator == "kitty") {
-    enable = true;
+  options.metronome.apps.kitty = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = isDefault;
+      description = "Enable kitty terminal";
+    };
 
-    themeFile = "tokyo_night_night";
+    color-theme = lib.mkOption {
+      type = lib.types.enum [
+        "tokyo-night"
+      ];
+      default = "tokyo-night";
+    };
+  };
 
-    shellIntegration.enableFishIntegration = fishEnabled;
+  config = lib.mkIf cfg.enable {
 
-    extraConfig = builtins.readFile ./kitty.conf;
+    programs.kitty = {
+      enable = true;
+
+      themeFile = "tokyo_night_night";
+
+      shellIntegration.enableFishIntegration = isFishEnabled;
+
+      extraConfig = builtins.readFile ./kitty.conf;
+    };
   };
 }

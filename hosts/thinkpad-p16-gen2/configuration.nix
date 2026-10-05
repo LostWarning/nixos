@@ -61,12 +61,6 @@
 
     audio.backend = "pipewire";
 
-    terminal = {
-      emulator = "kitty";
-      shell = "fish";
-      prompt = "starship";
-    };
-
     editors = {
       neovim.enable = true;
       default = "neovim";

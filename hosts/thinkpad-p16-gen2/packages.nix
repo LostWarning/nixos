@@ -12,6 +12,7 @@ in
     ../../apps
 
     ../../apps/hyprland/hyprland.nix
+    ../../apps/kitty/kitty.nix
     ../../apps/btop.nix
     ../../apps/bun.nix
     ../../apps/direnv.nix
@@ -35,6 +36,7 @@ in
       system-monitor = "btop";
       web-browser = "google-chrome";
       file-explorer = "nautilus";
+      terminal = "kitty";
     };
 
     apps = {
