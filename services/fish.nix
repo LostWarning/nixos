@@ -5,11 +5,11 @@
 }:
 
 let
-  cfg = config.metronome.apps.fish;
+  cfg = config.metronome.services.fish;
   isDefault = (config.metronome.defaults.shell == "fish");
 in
 {
-  options.metronome.apps.fish = {
+  options.metronome.services.fish = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = isDefault;

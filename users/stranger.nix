@@ -6,9 +6,6 @@ rec {
   nixosModule =
     { config, pkgs, ... }:
 
-    let
-      shell = if (config.metronome.defaults.shell == "fish") then pkgs.fish else pkgs.bash;
-    in
     {
       users.users.${username} = {
         isNormalUser = true;
@@ -19,7 +16,7 @@ rec {
           "wheel"
           "docker"
         ];
-        shell = shell;
+        shell = pkgs.fish;
       };
     };
 }

@@ -20,9 +20,6 @@
 
     ../../modules
 
-    ../../apps/fish.nix
-    ../../apps/starship.nix
-
     ../../modules/defaults.nix
 
   ];
@@ -49,10 +46,10 @@
 
     defaults = {
       display-manager = "greetd";
-      shell = "fish";
-      shell-prompt = "starship";
       web-server = "nginx";
       audio-backend = "pipewire";
+      shell = "fish";
+      shell-prompt = "starship";
     };
 
     services = {

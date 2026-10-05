@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 
@@ -35,6 +36,7 @@ in
       shellIntegration.enableFishIntegration = isFishEnabled;
 
       extraConfig = builtins.readFile ./kitty.conf;
+
     };
   };
 }

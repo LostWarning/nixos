@@ -5,13 +5,12 @@
 }:
 
 let
-  cfg = config.metronome.apps.starship;
+  cfg = config.metronome.services.starship;
   isDefault = (config.metronome.defaults.shell-prompt == "starship");
 in
 
 {
-
-  options.metronome.apps.starship = {
+  options.metronome.services.starship = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = isDefault;
@@ -22,9 +21,6 @@ in
   config = lib.mkIf cfg.enable {
     programs.starship = {
       enable = true;
-      enableBashIntegration = true;
-      enableFishIntegration = true;
-      enableZshIntegration = true;
     };
   };
 }
