@@ -2,12 +2,8 @@
 
 {
   imports = [
-
     ../../../../apps
-
-    ../../../../modules
-
-    ./theme.nix
+    ../../../../profiles
   ];
 
   metronome = {
@@ -47,6 +43,8 @@
     brightnessctl
     networkmanagerapplet
     blueman
+    wl-clipboard
+    hyprshot
   ];
 
 }

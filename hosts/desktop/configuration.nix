@@ -19,7 +19,7 @@
     ./networking.nix
     ./filesystem.nix
 
-    ../../modules
+    ../../profiles/defaults.nix
   ];
 
   boot.kernelPackages = pkgs.linuxPackages_zen;

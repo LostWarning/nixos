@@ -2,22 +2,13 @@
 
 {
   imports = [
-
     ../../../../apps
-
-    ../../../../modules
-
-    ./theme.nix
+    ../../../../profiles
   ];
 
   metronome = {
-    defaults = {
-      desktop-environment = "hyprland";
-      system-monitor = "btop";
-      web-browser = "google-chrome";
-      file-explorer = "nautilus";
-      terminal = "kitty";
-      text-editor = "nvim";
+    profiles = {
+      desktops.hyprland.enable = true;
     };
 
     apps = {
@@ -34,12 +25,7 @@
       mpd.enable = true;
       mpv.enable = true;
       nodejs.enable = true;
-      pavucontrol.enable = true;
       posting.enable = true;
-      pwvucontrol.enable = true;
-      quickshell.enable = true;
-      ssh.enable = true;
-      swayimg.enable = true;
     };
   };
 
@@ -47,6 +33,8 @@
     brightnessctl
     networkmanagerapplet
     blueman
+    wl-clipboard
+    hyprshot
   ];
 
 }

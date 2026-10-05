@@ -18,7 +18,7 @@
 
     ./networking.nix
 
-    ../../modules
+    ../../profiles/defaults.nix
   ];
 
   hardware.graphics = {

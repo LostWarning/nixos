@@ -22,6 +22,7 @@
     imports = [
       ../../../../common/xdg.nix
       ./packages.nix
+      ./theme.nix
     ];
 
     home.username = "stranger";

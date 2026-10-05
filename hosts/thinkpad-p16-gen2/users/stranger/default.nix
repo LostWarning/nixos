@@ -4,7 +4,6 @@
 }:
 
 {
-
   users.users.stranger = {
     isNormalUser = true;
     description = "Amal C.S";
@@ -14,7 +13,6 @@
       "audio"
       "docker"
     ];
-
     shell = pkgs.fish;
   };
 
@@ -22,6 +20,7 @@
     imports = [
       ../../../../common/xdg.nix
       ./packages.nix
+      ./theme.nix
     ];
 
     home.username = "stranger";
