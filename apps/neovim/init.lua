@@ -2,6 +2,7 @@ vim.g.loaded_node_provider = 0
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_ruby_provider = 0
 vim.g.loaded_python3_provider = 0
+
 -- ============================================================================
 -- 1. CORE OPTIONS & LEADER KEY
 -- ============================================================================
@@ -99,429 +100,266 @@ map("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
 map("n", "<S-h>", "<cmd>bprevious<CR>", { desc = "Prev buffer" })
 map("n", "<S-l>", "<cmd>bnext<CR>", { desc = "Next buffer" })
 
--- Toggle between Header and Source file in C/C++
--- map("n", "<leader>gh", "<cmd>ClangdSwitchSourceHeader<CR>", { buffer = ev.buf, desc = "Switch Header/Source" })
-
 -- Toggle fold at cursor (collapse / expand block)
 map("n", "<Tab>", "za", { desc = "Toggle fold/collapse code block" })
 map("n", "<leader>zc", "zM", { desc = "Collapse all code blocks" })
 map("n", "<leader>zo", "zR", { desc = "Expand all code blocks" })
 
 -- ============================================================================
--- 3. LAZY.NVIM BOOTSTRAP
+-- 3. THEME & UI ENHANCEMENTS
 -- ============================================================================
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-	local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-	local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
-	if vim.v.shell_error ~= 0 then
-		vim.api.nvim_echo({
-			{ "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-			{ out, "WarningMsg" },
-			{ "\nPress any key to exit..." },
-		}, true, {})
-		vim.fn.getchar()
-		os.exit(1)
-	end
+-- Tokyonight colorscheme
+require("tokyonight").setup({
+	style = "night",
+	transparent = true,
+	styles = {
+		sidebars = "transparent",
+		floats = "transparent",
+	},
+})
+vim.cmd([[colorscheme tokyonight-night]])
+
+-- Statusline (Lualine)
+require("lualine").setup({
+	options = {
+		theme = "tokyonight",
+		icons_enabled = true,
+		component_separators = { left = "│", right = "│" },
+		section_separators = { left = "", right = "" },
+	},
+	sections = {
+		lualine_a = { "mode" },
+		lualine_b = { "branch", "diff", "diagnostics" },
+		lualine_c = { { "filename", path = 1 } },
+		lualine_x = { "encoding", "fileformat", "filetype" },
+		lualine_y = { "progress" },
+		lualine_z = { "location" },
+	},
+})
+
+-- Breadcrumbs & Code Context (Barbecue + Navic)
+require("barbecue").setup({})
+
+-- Indent Guides (indent-blankline)
+require("ibl").setup({
+	indent = {
+		char = "|",
+	},
+	scope = {
+		enabled = true,
+		show_start = true,
+		show_end = true,
+		highlight = { "Function", "Label" },
+	},
+})
+
+-- Git Signs in Gutter
+require("gitsigns").setup({
+	current_line_blame = false,
+})
+
+-- Autopairs
+require("nvim-autopairs").setup({})
+
+-- ============================================================================
+-- 4. NAVIGATION & WORKSPACE
+-- ============================================================================
+-- File Explorer (Neo-tree)
+require("neo-tree").setup({
+	filesystem = {
+		filtered_items = {
+			visible = true,
+		},
+	},
+})
+map("n", "<leader>e", "<cmd>Neotree toggle<CR>", { desc = "Toggle File Explorer" })
+
+-- Fuzzy Finder (Telescope)
+require("telescope").setup({})
+map("n", "<leader>ff", "<cmd>Telescope find_files<CR>", { desc = "Find Files" })
+map("n", "<leader>fg", "<cmd>Telescope live_grep<CR>", { desc = "Find Text (Grep)" })
+map("n", "<leader>fb", "<cmd>Telescope buffers<CR>", { desc = "Find Buffers" })
+map("n", "<leader>fh", "<cmd>Telescope help_tags<CR>", { desc = "Find Help Tags" })
+
+-- Project Management
+local ok_project, project = pcall(require, "project")
+if not ok_project then
+	ok_project, project = pcall(require, "project_nvim")
 end
-vim.opt.rtp:prepend(lazypath)
+if ok_project then
+	project.setup({
+		patterns = { ".git", "Makefile", "compile_commands.json", "Cargo.toml", "package.json" },
+	})
+	pcall(function()
+		require("telescope").load_extension("projects")
+	end)
+end
+map("n", "<leader>fp", "<Cmd>Telescope projects<CR>", { desc = "Find Projects" })
 
--- ====================================================================
--- 4. direnv.vim integration
--- ====================================================================
+-- Toggleable Terminal (ToggleTerm)
+require("toggleterm").setup({
+	size = 12,
+	open_mapping = [[<C-\>]],
+	hide_numbers = true,
+	shade_terminals = true,
+	shading_factor = 2,
+	start_in_insert = true,
+	insert_mappings = true,
+	terminal_mappings = true,
+	persist_size = true,
+	direction = "horizontal",
+	close_on_exit = true,
+	float_opts = {
+		border = "curved",
+		winblend = 0,
+	},
+})
+map("n", "<C-\\>", "<cmd>ToggleTerm<CR>", { desc = "Toggle Terminal" })
+map("n", "<leader>tf", "<cmd>ToggleTerm direction=float<CR>", { desc = "Toggle Floating Terminal" })
+map("n", "<leader>th", "<cmd>ToggleTerm direction=horizontal size=12<CR>", { desc = "Toggle Horizontal Terminal" })
 
--- Quiet direnv status messages in Neovim command line (optional)
-vim.g.direnv_silent_load = 1
+-- Diagnostics Viewer (Trouble)
+require("trouble").setup({})
+map("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics (Trouble)" })
+map("n", "<leader>cs", "<cmd>Trouble symbols toggle focus=false<cr>", { desc = "Symbols (Trouble)" })
 
--- Restart LSPs automatically whenever direnv finishes loading/switching an environment
-vim.api.nvim_create_autocmd("User", {
-	pattern = "DirenvLoaded",
+-- ============================================================================
+-- 5. SYNTAX HIGHLIGHTING (TREESITTER)
+-- ============================================================================
+-- Parsers are pre-compiled and managed declaratively by Nix.
+require("nvim-treesitter").setup({})
+
+-- Enable Treesitter syntax highlighting for buffers with available parsers
+vim.api.nvim_create_autocmd("FileType", {
+	callback = function(args)
+		pcall(vim.treesitter.start, args.buf)
+	end,
+})
+
+-- Enable Treesitter indentation
+vim.api.nvim_create_autocmd("FileType", {
 	callback = function()
-		-- Only restart LSPs if lspconfig is loaded and active
-		local ok, _ = pcall(require, "lspconfig")
-		if ok then
-			vim.cmd("LspRestart")
-		end
+		pcall(function()
+			vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+		end)
 	end,
 })
 
 -- ============================================================================
--- 5. PLUGINS SETUP
+-- 6. CODE FORMATTING (CONFORM)
 -- ============================================================================
-require("lazy").setup({
-
-	rocks = {
-		enable = false,
+local conform = require("conform")
+conform.setup({
+	formatters_by_ft = {
+		lua = { "stylua" },
+		c = { "clang-format" },
+		cpp = { "clang-format" },
+		python = { "isort", "black" },
+		rust = { "rustfmt" },
+		javascript = { "prettierd", "prettier", stop_after_first = true },
+		json = { "prettier", "jq", stop_after_first = true },
+		jsonc = { "prettier" },
 	},
-	-- Colorscheme
-	{
-		"folke/tokyonight.nvim",
-		lazy = false,
-		priority = 1000,
-		config = function()
-			require("tokyonight").setup({
-				style = "night",
-				transparent = true,
-				styles = {
-					sidebars = "transparent",
-					floats = "transparent",
-				},
-			})
-			vim.cmd([[colorscheme tokyonight-night]])
+	format_on_save = {
+		timeout_ms = 500,
+		lsp_fallback = true,
+	},
+})
+
+map({ "n", "v" }, "<leader>f", function()
+	conform.format({ async = true, lsp_fallback = true })
+end, { desc = "Format buffer" })
+
+-- ============================================================================
+-- 7. AUTOCOMPLETION (NVIM-CMP)
+-- ============================================================================
+local cmp = require("cmp")
+local luasnip = require("luasnip")
+
+cmp.setup({
+	snippet = {
+		expand = function(args)
+			luasnip.lsp_expand(args.body)
 		end,
 	},
-
-	-- Modern Treesitter (v1.0+ API)
-	{
-		"nvim-treesitter/nvim-treesitter",
-		build = ":TSUpdate",
-		config = function()
-			local parsers = { "lua", "c", "cpp", "rust", "python", "bash", "nix", "json", "markdown", "glsl" }
-
-			-- Modern Treesitter installation and setup
-			require("nvim-treesitter").setup({
-				ensure_installed = parsers,
-				auto_install = true,
-				highlight = { enable = true },
-				indent = { enable = true },
-			})
-		end,
-	},
-
-	-- File Explorer (Neo-tree)
-	{
-		"nvim-neo-tree/neo-tree.nvim",
-		branch = "v3.x",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-			"nvim-tree/nvim-web-devicons",
-			"MunifTanjim/nui.nvim",
-		},
-		keys = {
-			{ "<leader>e", "<cmd>Neotree toggle<CR>", desc = "Toggle File Explorer" },
-		},
-		opts = {
-			filesystem = {
-				filtered_items = {
-					visible = true,
-				},
-			},
-		},
-	},
-
-	-- Fuzzy Finder (Telescope)
-	{
-		"nvim-telescope/telescope.nvim",
-		dependencies = { "nvim-lua/plenary.nvim" },
-		keys = {
-			{ "<leader>ff", "<cmd>Telescope find_files<CR>", desc = "Find Files" },
-			{ "<leader>fg", "<cmd>Telescope live_grep<CR>", desc = "Find Text (Grep)" },
-			{ "<leader>fb", "<cmd>Telescope buffers<CR>", desc = "Find Buffers" },
-			{ "<leader>fh", "<cmd>Telescope help_tags<CR>", desc = "Find Help Tags" },
-		},
-	},
-
-	-- Mason & Mason-LSPConfig
-	{
-		"williamboman/mason.nvim",
-		config = true,
-	},
-	{
-		"williamboman/mason-lspconfig.nvim",
-		opts = {
-			ensure_installed = {},
-		},
-	},
-
-	-- Autocompletion Engine (nvim-cmp)
-	{
-		"hrsh7th/nvim-cmp",
-		dependencies = {
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-path",
-			"L3MON4D3/LuaSnip",
-			"saadparwaiz1/cmp_luasnip",
-		},
-		config = function()
-			local cmp = require("cmp")
-			local luasnip = require("luasnip")
-
-			cmp.setup({
-				snippet = {
-					expand = function(args)
-						luasnip.lsp_expand(args.body)
-					end,
-				},
-				mapping = cmp.mapping.preset.insert({
-					["<C-b>"] = cmp.mapping.scroll_docs(-4),
-					["<C-f>"] = cmp.mapping.scroll_docs(4),
-					["<C-Space>"] = cmp.mapping.complete(),
-					["<CR>"] = cmp.mapping.confirm({ select = true }),
-					["<Tab>"] = cmp.mapping(function(fallback)
-						if cmp.visible() then
-							cmp.select_next_item()
-						else
-							fallback()
-						end
-					end, { "i", "s" }),
-				}),
-				sources = cmp.config.sources({
-					{ name = "nvim_lsp" },
-					{ name = "luasnip" },
-					{ name = "buffer" },
-					{ name = "path" },
-				}),
-			})
-		end,
-	},
-
-	-- Native LSP Config (vim.lsp.config & vim.lsp.enable API)
-	{
-		"neovim/nvim-lspconfig",
-		dependencies = { "hrsh7th/cmp-nvim-lsp", "direnv/direnv" },
-		config = function()
-			vim.g.direnv_silent_load = 1
-			local capabilities = require("cmp_nvim_lsp").default_capabilities()
-
-			local default_config = {
-				capabilities = capabilities,
-				root_marker = { "flake.nix", ".git", ".envrc" },
-			}
-
-			-- Lua LSP
-			vim.lsp.config.lua_ls = vim.tbl_deep_extend("force", default_config, {
-				settings = {
-					Lua = {
-						diagnostics = {
-							globals = { "vim" },
-						},
-						workspace = {
-							checkThirdParty = false,
-						},
-					},
-				},
-			})
-
-			-- C/C++, Rust, and Nix LSPs
-			vim.lsp.config.clangd = default_config
-			vim.lsp.config.rust_analyzer = default_config
-			vim.lsp.config.nil_ls = default_config
-			vim.lsp.config.qmlls = default_config
-
-			-- Enable Language Servers
-			local servers = { "lua_ls", "clangd", "nil_ls", "qmlls" }
-			for _, server in ipairs(servers) do
-				vim.lsp.enable(server)
+	mapping = cmp.mapping.preset.insert({
+		["<C-b>"] = cmp.mapping.scroll_docs(-4),
+		["<C-f>"] = cmp.mapping.scroll_docs(4),
+		["<C-Space>"] = cmp.mapping.complete(),
+		["<CR>"] = cmp.mapping.confirm({ select = true }),
+		["<Tab>"] = cmp.mapping(function(fallback)
+			if cmp.visible() then
+				cmp.select_next_item()
+			else
+				fallback()
 			end
+		end, { "i", "s" }),
+	}),
+	sources = cmp.config.sources({
+		{ name = "nvim_lsp" },
+		{ name = "luasnip" },
+		{ name = "buffer" },
+		{ name = "path" },
+	}),
+})
 
-			-- Reload LSPs when direnv finishes evaluation
-			vim.api.nvim_create_autocmd("User", {
-				pattern = "DirenvLoaded",
-				callback = function()
-					for _, server in ipairs(servers) do
-						-- Re-enable servers so they pick up binaries placed in $PATH by nix devShell
-						vim.lsp.enable(server)
-					end
-				end,
-			})
+-- ============================================================================
+-- 8. LANGUAGE SERVER PROTOCOL (LSP) & DIRENV
+-- ============================================================================
+vim.g.direnv_silent_load = 1
 
-			-- Attach keybindings on LSP connection
-			vim.api.nvim_create_autocmd("LspAttach", {
-				group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
-				callback = function(ev)
-					local opts = { buffer = ev.buf }
-					vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-					vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-					vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-					vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-					vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-					vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
-					vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
-				end,
-			})
-		end,
-	},
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
+local default_config = {
+	capabilities = capabilities,
+	root_markers = { "flake.nix", ".git", ".envrc" },
+}
 
-	-- Toggleable Terminal Plugin
-	{
-		"akinsho/toggleterm.nvim",
-		version = "*",
-		keys = {
-			{ "<C-\\>", "<cmd>ToggleTerm<CR>", desc = "Toggle Terminal" },
-			{ "<leader>tf", "<cmd>ToggleTerm direction=float<CR>", desc = "Toggle Floating Terminal" },
-			{ "<leader>th", "<cmd>ToggleTerm direction=horizontal size=12<CR>", desc = "Toggle Horizontal Terminal" },
-		},
-		opts = {
-			size = 12,
-			open_mapping = [[<C-\>]],
-			hide_numbers = true,
-			shade_terminals = true,
-			shading_factor = 2,
-			start_in_insert = true,
-			insert_mappings = true,
-			terminal_mappings = true,
-			persist_size = true,
-			direction = "horizontal", -- 'vertical' | 'ho erizontal' | 'tab' | 'float'
-			close_on_exit = true,
-			float_opts = {
-				border = "curved",
-				winblend = 0,
+-- Server configs
+vim.lsp.config.lua_ls = vim.tbl_deep_extend("force", default_config, {
+	settings = {
+		Lua = {
+			diagnostics = {
+				globals = { "vim" },
+			},
+			workspace = {
+				checkThirdParty = false,
 			},
 		},
 	},
+})
 
-	-- Project management
-	{
-		"ahmedkhalf/project.nvim",
-		config = function()
-			require("project_nvim").setup({
-				-- Methods used to detect the project root
-				detection_methods = { "pattern" },
-				-- Root markers (great for systems programming and git repos)
-				patterns = { ".git", "Makefile", "compile_commands.json", "Cargo.toml", "package.json" },
-			})
+vim.lsp.config.clangd = default_config
+vim.lsp.config.rust_analyzer = default_config
+vim.lsp.config.nil_ls = default_config
+vim.lsp.config.qmlls = default_config
 
-			-- Tell Telescope to load the projects extension
-			require("telescope").load_extension("projects")
-		end,
-		keys = {
-			-- Bind it to a hotkey, e.g., Space + f + p
-			{ "<leader>fp", "<Cmd>Telescope projects<CR>", desc = "Find Projects" },
-		},
-	},
+-- Enable servers
+local servers = { "lua_ls", "clangd", "nil_ls", "qmlls", "rust_analyzer" }
+for _, server in ipairs(servers) do
+	vim.lsp.enable(server)
+end
 
-	-- Diagnostics for the code
-	{
-		"folke/trouble.nvim",
-		dependencies = { "nvim-tree/nvim-web-devicons" },
-		opts = {
-			-- Default configuration is usually perfect
-		},
-		keys = {
-			{
-				"<leader>xx",
-				"<cmd>Trouble diagnostics toggle<cr>",
-				desc = "Diagnostics (Trouble)",
-			},
-			{
-				"<leader>cs",
-				"<cmd>Trouble symbols toggle focus=false<cr>",
-				desc = "Symbols (Trouble)",
-			},
-		},
-	},
+-- Reload LSPs when direnv finishes evaluation to pick up tools from nix devShells
+vim.api.nvim_create_autocmd("User", {
+	pattern = "DirenvLoaded",
+	callback = function()
+		for _, server in ipairs(servers) do
+			vim.lsp.enable(server)
+		end
+	end,
+})
 
-	-- Auto-Format
-	{
-		"stevearc/conform.nvim",
-		event = { "BufWritePre" },
-		cmd = { "ConformInfo" },
-		keys = {
-			{
-				-- Manual format trigger (Space + f)
-				"<leader>f",
-				function()
-					require("conform").format({ async = true, lsp_fallback = true })
-				end,
-				mode = "",
-				desc = "Format buffer",
-			},
-		},
-		opts = {
-			-- Map filetypes to formatters
-			formatters_by_ft = {
-				lua = { "stylua" },
-				c = { "clang-format" },
-				cpp = { "clang-format" },
-				python = { "isort", "black" },
-				rust = { "rustfmt" },
-				javascript = { "prettierd", "prettier", stop_after_first = true },
-				json = { "prettier", "jq", stop_after_first = true },
-				jsonc = { "prettier" },
-			},
-			-- Enable auto-format on save
-			format_on_save = {
-				timeout_ms = 500,
-				lsp_fallback = true, -- If no dedicated formatter is installed, use the LSP
-			},
-		},
-	},
-
-	-- Auto pairs (Bracket)
-	{
-		"windwp/nvim-autopairs",
-		event = "InsertEnter",
-		config = true,
-		-- 'config = true' is exactly equivalent to requiring and calling setup()
-	},
-
-	{
-		"utilyre/barbecue.nvim",
-		name = "barbecue",
-		version = "*",
-		dependencies = {
-			"SmiteshP/nvim-navic",
-			"nvim-tree/nvim-web-devicons",
-		},
-		opts = {
-			-- Automatically uses LSP / treesitter for code context
-		},
-	},
-	-- Vertical indent lines & active scope highlighting
-	{
-		"lukas-reineke/indent-blankline.nvim",
-		main = "ibl",
-		opts = {
-			indent = {
-				char = "|", -- Character for regular indent lines
-			},
-			scope = {
-				enabled = true,
-				show_start = true, -- Highlight start line of scope
-				show_end = true, -- Highlight end line of scope
-				highlight = { "Function", "Label" },
-			},
-		},
-	},
-
-	-- Git Integration (Fugitive)
-	{
-		"tpope/vim-fugitive",
-		--keys = {
-		--{ "<leader>g", "<cmd>Git<CR>", desc = "Git Status (Fugitive)" },
-		--},
-	},
-
-	-- Git Integration (Signs in gutter & branch detection)
-	{
-		"lewis6991/gitsigns.nvim",
-		opts = {
-			current_line_blame = false, -- Set to true if you want inline git blame text
-		},
-	},
-
-	-- Statusline (Shows Git Branch, LSP diagnostics, file info)
-	{
-		"nvim-lualine/lualine.nvim",
-		dependencies = { "nvim-tree/nvim-web-devicons" },
-		config = function()
-			require("lualine").setup({
-				options = {
-					theme = "tokyonight", -- Matches your installed colorscheme
-					icons_enabled = true,
-					component_separators = { left = "│", right = "│" },
-					section_separators = { left = "", right = "" },
-				},
-				sections = {
-					lualine_a = { "mode" },
-					lualine_b = { "branch", "diff", "diagnostics" }, -- 'branch' displays current git branch
-					lualine_c = { { "filename", path = 1 } }, -- Shows relative file path
-					lualine_x = { "encoding", "fileformat", "filetype" },
-					lualine_y = { "progress" },
-					lualine_z = { "location" },
-				},
-			})
-		end,
-	},
+-- Attach LSP keybindings on connection
+vim.api.nvim_create_autocmd("LspAttach", {
+	group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
+	callback = function(ev)
+		local opts = { buffer = ev.buf }
+		map("n", "gd", vim.lsp.buf.definition, vim.tbl_extend("force", opts, { desc = "Go to Definition" }))
+		map("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover Documentation" }))
+		map("n", "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code Action" }))
+		map("n", "<leader>rn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename" }))
+		map("n", "gr", vim.lsp.buf.references, vim.tbl_extend("force", opts, { desc = "Find References" }))
+		map("n", "[d", vim.diagnostic.goto_prev, vim.tbl_extend("force", opts, { desc = "Previous Diagnostic" }))
+		map("n", "]d", vim.diagnostic.goto_next, vim.tbl_extend("force", opts, { desc = "Next Diagnostic" }))
+	end,
 })
