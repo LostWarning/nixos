@@ -43,7 +43,7 @@
               home-manager.useUserPackages = true;
               home-manager.extraSpecialArgs = { inherit inputs; };
             }
-            ./hosts/desktop/users/stranger.nix
+            ./hosts/desktop/users/stranger
           ];
         };
         thinkpad-p16-gen2 = nixpkgs.lib.nixosSystem {

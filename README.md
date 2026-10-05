@@ -1,243 +1,278 @@
-# WORK IN PROGRESS
 # ⏱️ Metronome — Modular NixOS & Home Manager Configuration
 
 A clean, declarative, and hierarchical NixOS configuration powered by **Flakes** and **Home Manager**.
 
-Rather than managing scattered package lists and disjointed boolean flags, this repository organizes the entire operating system around **Metronome**: a unified, intent-driven schema that bridges low-level NixOS system services and high-level Home Manager user environments.
+Rather than managing scattered package lists and disjointed boolean flags, this repository organizes the operating system around **Metronome**: a unified, intent-driven architecture that cleanly separates **machine-level system concerns** from **per-user environments**, while enabling flexible **role-based defaults and bundle overrides**.
 
 ---
 
-## 🏛️ The Metronome Architecture
+## 🏛️ The Metronome Design Philosophy
 
-Metronome establishes a **functional classification taxonomy** for systems. You declare the high-level intent and persona of a machine in its host configuration, and both system-level daemons and user-level applications automatically orchestrate themselves.
+Metronome is built on three core architectural principles:
+
+### 1. The Clean System vs. User Split (True Multi-User Ready)
+- **NixOS (`configuration.nix`) manages the Machine**:
+  Hardware drivers, filesystems, networking, system daemons (`greetd`, `pipewire`, `docker`, `nginx`), and system shells (`fish`, `starship`).
+- **Home Manager (`users/<name>/packages.nix`) manages the Person**:
+  Desktop environment configs, user default handlers (`terminal`, `web-browser`, `file-explorer`), dotfiles, and individual user tools.
+- **No Hardcoded Usernames**: Apps and services do not hardcode `/home/stranger` or `home-manager.users.${username}`. Every user profile is self-contained.
+
+### 2. Role-Based Defaults + App Extras Pattern
+When you select a default (e.g. `defaults.terminal = "kitty"` or `defaults.desktop-environment = "hyprland"`), Metronome automatically:
+1. Enables and provisions that application.
+2. Directs desktop keybindings and XDG handlers to launch it.
+3. Allows installing secondary applications alongside it without changing the default (e.g. `defaults.web-browser = "google-chrome"` with `apps.firefox.enable = true`).
+
+### 3. Nullable Defaults for Optional Tools
+Essential desktop components (terminal, file manager) have defaults provided by the window manager or user. Optional tool categories (like `system-monitor`) use `lib.types.nullOr` so that software like `btop` is **never installed unprompted** on minimal servers or laptops unless explicitly selected.
+
+---
+
+## 📐 Architecture Overview
 
 ```mermaid
 flowchart TD
-    Host["Host Configuration (hosts/desktop/configuration.nix)"]
-    Schema["Metronome Schema (modules/)"]
-    Services["System Services (services/)"]
-    Apps["Userland Applications (apps/)"]
+    subgraph Machine ["🖥️ NixOS System Level (hosts/<host>/configuration.nix)"]
+        SysConfig["Machine Persona (metronome = { ... })"]
+        SysDefaults["System Defaults (display-manager, shell, audio-backend, web-server)"]
+        SysServices["System Services (services/)"]
+        SysConfig --> SysDefaults
+        SysDefaults -->|"Auto-enables if default"| SysServices
+    end
 
-    Host -->|"Declares persona via metronome = { ... }"| Schema
-    Schema -->|"config.metronome.*"| Services
-    Schema -->|"osConfig.metronome.*"| Apps
+    subgraph UserSpace ["👤 Home Manager Level (hosts/<host>/users/<user>/packages.nix)"]
+        UserConfig["User Persona (metronome = { ... })"]
+        UserDefaults["User Defaults (desktop-environment, terminal, web-browser, file-explorer, system-monitor, text-editor)"]
+        UserApps["Userland Applications (apps/)"]
+        UserConfig --> UserDefaults
+        UserDefaults -->|"isDefault auto-enables"| UserApps
+    end
+
+    SysConfig -.->|"Provisions user accounts"| UserSpace
 ```
-
-### Core Architecture Layers:
-
-1. **`modules/` (The Metronome Schema)**: Defines the hierarchical options under `options.metronome.*` (window managers, terminal stack, dev runtimes, audio, system monitors, file managers).
-2. **`hosts/` (The Machine Personas)**: Each host configures its role by toggling high-level Metronome categories (e.g. a power workstation vs. a minimalist laptop).
-3. **`services/` (System-Level Realization)**: NixOS modules that read `config.metronome.*` to provision root services, system daemons, display managers, and audio servers.
-4. **`apps/` (User-Level Realization)**: Home Manager modules that read `osConfig.metronome.*` to install user packages, deploy dotfiles, and wire toolchains.
-5. **`common/` (Foundations)**: Shared baselines across every machine (bootloader, Nix settings, GC, locales, base utilities).
-6. **`hardware/` (Hardware Profiles)**: Hardware-specific driver profiles (e.g., AMD GPU, OpenCL, Mesa).
-7. **`users/` (Identity SSOT)**: Centralized user metadata (username, full name, email) injected into both NixOS and Home Manager.
 
 ---
 
 ## 📂 Repository Layout
 
 ```text
-.
+/etc/nixos/
 ├── flake.nix                          # Master orchestrator: inputs, host declarations, and user bindings
-├── flake.lock                         # Pinned dependency lockfile ensuring reproducible builds
-├── hardware-configuration.nix         # Auto-generated hardware detection for target system
+├── flake.lock                         # Pinned dependency lockfile
 ├── README.md                          # Repository documentation and architectural guide
 │
-├── modules/                           # Metronome schema definitions (options.metronome.*)
-│   ├── default.nix                    # Module aggregation entry point
-│   ├── window_manager.nix             # Window manager selection (hyprland, gnome, kde, none)
-│   ├── display-manager.nix            # Display manager selection (greetd, sddm, none)
-│   ├── audio.nix                      # Audio backend selection (pipewire, none)
-│   ├── terminal.nix                   # Terminal emulator, shell, and prompt options
-│   ├── editor.nix                     # Editor preferences (neovim, vim, nano)
-│   ├── ai.nix                         # AI & LLM engine capabilities
-│   ├── containers.nix                 # Container runtime configurations
-│   ├── games.nix                      # Gaming and hardware integration options
-│   ├── networking/                    # Network daemons and proxies
-│   │   ├── default.nix
-│   │   └── http-server.nix            # HTTP server selection (nginx, apache)
-│   └── dev/                           # Development toolchain taxonomies
-│       ├── default.nix                # Dev modules aggregator
-│       ├── typescript.nix             # TypeScript/JavaScript runtimes (nodejs, bun)
-│       └── cxx.nix                    # C/C++ toolchains, build systems, and debuggers
+├── modules/                           # Central Metronome schema (options.metronome.defaults.*)
+│   └── default.nix                    # Declarations for system & user defaults (shell, browser, terminal, etc.)
 │
-├── hosts/                             # Machine-specific host configurations
-│   └── desktop/                       # Workstation host profile ("nixos")
-│       ├── configuration.nix          # Host entry point declaring the Metronome persona
-│       ├── hardware.nix               # Hardware profile links (GPU, CPU)
-│       └── filesystem.nix             # File systems, Btrfs subvolumes, and swap configuration
-│
-├── services/                          # System-level services and daemons (NixOS)
-│   ├── default.nix                    # Services aggregator
-│   ├── hyprland.nix                   # System-level Hyprland compositing, polkit, portals
-│   ├── pipewire.nix                   # PipeWire, WirePlumber, dynamic sample rate switching
+├── services/                          # NixOS System-Level Services & Daemons
+│   ├── default.nix                    # System services aggregator
+│   ├── docker.nix                     # Docker container runtime daemon
+│   ├── fish.nix                       # System-wide Fish login shell
 │   ├── greetd.nix                     # Lightweight tuigreet display manager
-│   ├── docker.nix                     # Container runtime daemon
+│   ├── hyprland.nix                   # System-level Hyprland compositing, polkit, portals, UWSM
 │   ├── nginx.nix                      # Web server daemon
-│   ├── ollama.nix                     # Ollama LLM inference service
+│   ├── ollama.nix                     # Ollama local LLM inference engine
+│   ├── pipewire.nix                   # PipeWire audio server & real-time scheduling
 │   ├── postgresql.nix                 # Relational database service
+│   ├── ssh.nix                        # System-wide SSH-agent socket activation
+│   ├── starship.nix                   # System-wide Starship prompt integration
 │   └── steam.nix                      # Steam hardware integration & firewall rules
 │
-├── apps/                              # User-level applications and dotfiles (Home Manager)
-│   ├── default.nix                    # Applications aggregator
-│   ├── hyprland/                      # Hyprland user configuration (hyprland.lua, keybinds, theme)
-│   ├── kitty/                         # Kitty terminal emulator config and styling
-│   ├── neovim/                        # Neovim plugins, language servers, and Lua config
-│   ├── swayimg/                       # Lightweight image viewer with custom bindings
-│   ├── fish.nix                       # Fish shell configuration and integrations
-│   ├── starship.nix                   # Starship prompt configuration
-│   ├── git.nix                        # Git client, aliases, and user metadata
-│   ├── direnv.nix                     # Direnv + nix-direnv shell integration
+├── apps/                              # Home Manager User Applications & Dotfiles
+│   ├── default.nix                    # Applications aggregator (all apps imported automatically)
+│   ├── antigravity.nix                # Antigravity CLI agent
 │   ├── btop.nix                       # TUI system monitor
 │   ├── bun.nix                        # Bun JavaScript runtime
-│   ├── nodejs.nix                     # Node.js JavaScript runtime
+│   ├── direnv.nix                     # Direnv + nix-direnv shell integration
+│   ├── git.nix                        # Git client with per-user name/email options
 │   ├── google-chrome.nix              # Web browser
+│   ├── hyprland/                      # Hyprland user config (hyprland.lua, keybinds, monitors)
+│   ├── kitty/                         # Kitty terminal emulator config and styling
+│   ├── mpd.nix                        # MPD music player daemon (user-space PipeWire & MPRIS)
 │   ├── mpv.nix                        # Hardware-accelerated media player
-│   ├── posting.nix                    # TUI HTTP/REST client
-│   ├── thunar.nix                     # Graphical file manager
 │   ├── nautilus.nix                   # GNOME file manager
-│   ├── pavucontrol.nix                # PulseAudio / PipeWire volume control
-│   └── pwvucontrol.nix                # PipeWire native volume control
+│   ├── neovim/                        # Neovim plugins, language servers, and Lua config
+│   ├── nodejs.nix                     # Node.js runtime
+│   ├── pavucontrol.nix                # Audio volume control GUI
+│   ├── posting.nix                    # TUI HTTP client
+│   ├── pwvucontrol.nix                # Native PipeWire volume control
+│   ├── quickshell.nix                 # Modern desktop shell & widgets
+│   ├── ssh.nix                        # User SSH client config & auto Ed25519 key generation
+│   ├── swayimg/                       # Lightweight image viewer with custom Lua bindings
+│   └── thunar.nix                     # Thunar file manager with archive & volume plugins
 │
-├── common/                            # Shared universal configurations
-│   ├── nixos.nix                      # Bootloader (systemd-boot), Nix flakes, weekly GC
-│   ├── home.nix                       # Universal Home Manager baseline
-│   ├── packages.nix                   # Core utilities (curl, wget, jq, btrfs-progs) & fonts
-│   ├── services.nix                   # Essential shared services (NetworkManager, Udisks2, GVFS)
-│   ├── env_variables.nix              # Global environment variables
-│   ├── xdg.nix                        # Standard XDG user directories layout
-│   ├── ssh-key.nix                    # Auto-generated Ed25519 user keys & SSH agent
+├── hosts/                             # Machine-Specific Profiles
+│   ├── desktop/                       # Main Workstation ("desktop")
+│   │   ├── configuration.nix          # System-level services and machine defaults
+│   │   ├── networking.nix             # Hostname, static nameservers, firewall rules
+│   │   ├── filesystem.nix             # Btrfs pools, subvolumes, and swapfile
+│   │   └── users/
+│   │       └── stranger/              # User profile on desktop
+│   │           ├── default.nix        # System account + Home Manager entry point
+│   │           ├── packages.nix       # User default selections and enabled apps
+│   │           └── theme.nix          # GTK theme, Papirus icons, and dconf settings
+│   │
+│   └── thinkpad-p16-gen2/             # Laptop Profile ("thinkpad-p16-gen2")
+│       ├── configuration.nix          # System-level services and laptop defaults
+│       ├── hardware-configuration.nix # Hardware scan (partitions, Intel microcode)
+│       ├── networking.nix             # Hostname and firewall
+│       └── users/
+│           └── stranger/              # User profile on ThinkPad
+│               ├── default.nix        # System account + Home Manager entry point
+│               ├── packages.nix       # User default selections and enabled apps
+│               └── theme.nix          # GTK theme, Papirus icons, and dconf settings
+│
+├── common/                            # Shared Universal System Configurations
+│   ├── nixos.nix                      # systemd-boot, Flakes enablement, weekly GC
+│   ├── services.nix                   # Essential shared services (NetworkManager, UDisks2, GVFS, UPower)
+│   ├── fonts.nix                      # System fonts (JetBrainsMono Nerd Font, Noto Emoji, DejaVu, Corefonts)
+│   ├── env_variables.nix              # Global session variables (Ozone Wayland, default editor)
+│   ├── xdg.nix                        # Standard XDG user directories and default desktop entries
 │   └── locale/
-│       └── india.nix                  # Timezone (Asia/Kolkata) & locale formatting
+│       └── india.nix                  # Timezone (Asia/Kolkata) and locale formatting
 │
-├── hardware/                          # Modular hardware definitions
-│   └── gpu/
-│       └── radeon.nix                 # AMD GPU Mesa drivers, Vulkan, OpenCL, amdgpu_top
-│
-└── users/                             # User identity declarations (SSOT)
-    └── stranger.nix                   # User identity, system groups, and login shell
+└── hardware/                          # Modular Hardware Profiles
+    ├── gpu/
+    │   └── radeon.nix                 # AMD GPU Mesa drivers, Vulkan, OpenCL, amdgpu_top
+    └── laptop/
+        └── thinkpad/
+            └── p16-gen2.nix           # ThinkPad P16 Gen 2 hardware specializations
 ```
 
 ---
 
 ## 🎯 How Metronome Works in Practice
 
-Machines are configured by declaring their functional classification under `metronome` in `hosts/<machine>/configuration.nix`.
+### 1. Declaring Machine Capabilities (`hosts/<host>/configuration.nix`)
+In the host configuration, you specify system services and machine defaults:
 
-### Example 1: High-Performance Developer Workstation
 ```nix
-# hosts/desktop/configuration.nix
 metronome = {
-  window_manager = "hyprland";
-  display_manager = "greetd";
-
-  audio.backend = "pipewire";
-
-  terminal = {
-    emulator = "kitty";
+  defaults = {
+    display-manager = "greetd";
+    web-server = "nginx";
+    audio-backend = "pipewire";
     shell = "fish";
-    prompt = "starship";
+    shell-prompt = "starship";
   };
 
-  editors = {
-    neovim.enable = true;
-    default = "neovim";
-  };
-
-  dev = {
-    cxx.enable = true;
-    typescript = {
-      enable = true;
-      runtimes = [ "nodejs" "bun" ];
-    };
-  };
-
-  containers.enable = true;
-  containers.docker.enable = true;
-
-  networking.http_server = {
-    enable = true;
-    backend = "nginx";
-  };
-
-  ai = {
-    enable = true;
-    engine.ollama.enable = true;
-  };
-
-  games = {
-    enable = true;
+  services = {
+    docker.enable = true;
+    hyprland.enable = true;
+    ollama.enable = true;
+    ssh.enable = true;       # Starts system-wide SSH agent socket
     steam.enable = true;
   };
 };
 ```
 
-### Example 2: Minimalist Family Laptop
-Because Metronome isolates capabilities, configuring a simple, bloat-free system for another user requires only toggling the categories:
+### 2. Declaring User Persona & Defaults (`users/<user>/packages.nix`)
+In the user's packages file, you select default handlers and enable extra apps:
+
 ```nix
-# hosts/laptop/configuration.nix
 metronome = {
-  window_manager = "gnome";            # Stable, familiar desktop
-  display_manager = "sddm";
-
-  terminal = {
-    emulator = "none";                 # Uses GNOME Terminal defaults
-    shell = "bash";
-    prompt = "none";
+  defaults = {
+    desktop-environment = "hyprland"; # Auto-enables Hyprland user environment
+    terminal = "kitty";               # Sets Kitty as default terminal
+    web-browser = "google-chrome";    # Sets Chrome as default browser
+    file-explorer = "nautilus";       # Sets Nautilus as default file manager
+    system-monitor = "btop";          # Sets Btop as default system monitor
+    text-editor = "nvim";             # Sets Neovim as default editor
   };
 
-  editors = {
-    neovim.enable = false;             # No developer editors
-    default = "nano";
-  };
+  apps = {
+    bun.enable = true;
+    direnv.enable = true;
+    nodejs.enable = true;
+    mpd.enable = true;
+    quickshell.enable = true;
+    ssh.enable = true;
 
-  dev = {
-    cxx.enable = false;                # Zero compilers or debuggers installed
-    typescript.enable = false;         # No Node.js / Bun
+    # User-specific Git identity
+    git = {
+      enable = true;
+      name = "Amal C.S";
+      email = "amal4cs@gmail.com";
+    };
   };
-
-  containers.enable = false;           # No Docker
-  networking.http_server.enable = false;
-  ai.enable = false;                   # No LLM engines
-  games.enable = false;                # No gaming dependencies
 };
 ```
 
 ---
 
-## 🔧 Adding New Capabilities to Metronome
+## 🔧 How to Extend Metronome
 
-When adding an application or daemon to your system, follow the three-step Metronome pattern:
+### Adding a New User Application
+1. Create `apps/<app-name>.nix`:
+   ```nix
+   { config, lib, pkgs, ... }:
+   let
+     cfg = config.metronome.apps.<app-name>;
+     # Optional: link to a default slot
+     isDefault = (config.metronome.defaults.<slot> == "<app-name>");
+   in
+   {
+     options.metronome.apps.<app-name> = {
+       enable = lib.mkOption {
+         type = lib.types.bool;
+         default = isDefault;
+         description = "Enable <app-name>";
+       };
+     };
 
-1. **Define the Option** in `modules/`:
-   Add a classification option (e.g. `options.metronome.system_monitor = lib.mkOption { ... };` or `options.metronome.gaming.steam.enable = lib.mkEnableOption ...;`).
-2. **Implement the Target**:
-   - For **user apps/tools**: Create `apps/<name>.nix` using `lib.mkIf (osConfig.metronome.<category> == "<name>")` and import it into `apps/default.nix`.
-   - For **system services**: Create `services/<name>.nix` using `lib.mkIf (config.metronome.<category> == "<name>")` and import it into `services/default.nix`.
-3. **Select it in Host**:
-   Toggle the option in `hosts/<hostname>/configuration.nix`.
+     config = lib.mkIf cfg.enable {
+       home.packages = [ pkgs.<app-name> ];
+       # or configure programs.<app-name>
+     };
+   }
+   ```
+2. Add `./<app-name>.nix` to `apps/default.nix`.
+3. Enable it in any host's `packages.nix` with `metronome.apps.<app-name>.enable = true;` or by choosing it as a default.
+
+### Adding a New System Service
+1. Create `services/<service-name>.nix`:
+   ```nix
+   { config, lib, pkgs, ... }:
+   let
+     cfg = config.metronome.services.<service-name>;
+   in
+   {
+     options.metronome.services.<service-name> = {
+       enable = lib.mkEnableOption "<service-name>";
+     };
+
+     config = lib.mkIf cfg.enable {
+       services.<service-name>.enable = true;
+     };
+   }
+   ```
+2. Add `./<service-name>.nix` to `services/default.nix`.
+3. Enable it in `configuration.nix` under `metronome.services.<service-name>.enable = true;`.
 
 ---
 
-## 🚀 Rebuilding & Maintenance
+## 🚀 Rebuilding & System Commands
 
-### Apply System Changes
+### Rebuild and Switch
 ```bash
-sudo nixos-rebuild switch --flake /etc/nixos#nixos
+# On ThinkPad
+sudo nixos-rebuild switch --flake /etc/nixos#thinkpad-p16-gen2
+
+# On Desktop
+sudo nixos-rebuild switch --flake /etc/nixos#desktop
 ```
 
-### Check Flake & Syntax
+### Check Flake Syntax
 ```bash
 nix flake check
 ```
 
-### Update Flake Dependencies
+### Update Flake Inputs
 ```bash
 nix flake update
 ```
 
-### Clean Old Generations & Optimize Store
+### Storage Maintenance
 ```bash
 sudo nix-collect-garbage --delete-older-than 7d
 nix store optimise
