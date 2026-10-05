@@ -23,7 +23,7 @@ in
   config = lib.mkIf cfg.enable {
     programs.quickshell = {
       enable = true;
-      package = inputs.quickshell.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      package = inputs.quickshell.packages.${system}.default;
     };
 
     home.packages = with pkgs; [
