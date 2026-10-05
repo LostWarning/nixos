@@ -4,10 +4,19 @@
   ...
 }:
 
+let
+  cfg = config.metronome.apps.swayimg;
+in
 {
-  options.custom.apps.swayimg.enable = lib.mkEnableOption "Swayimg";
+  options.metronome.apps.swayimg = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "install swayimg";
+    };
+  };
 
-  config = lib.mkIf config.custom.apps.swayimg.enable {
+  config = lib.mkIf cfg.enable {
     programs.swayimg.enable = true;
 
     xdg.configFile."swayimg/init.lua".source = ./init.lua;

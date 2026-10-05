@@ -5,15 +5,14 @@ let
 in
 {
   imports = [
-    ../../packages/antigravity.nix
-    ../../packages/mpd.nix
-    ../../packages/quickshell.nix
+    ../../../../packages/mpd.nix
+    ../../../../packages/quickshell.nix
 
-    ../../apps
+    ../../../../apps
 
-    ../../packages/ssh.nix
+    ../../../../packages/ssh.nix
 
-    ../../modules/defaults.nix
+    ../../../../modules/defaults.nix
 
     ./theme.nix
   ];
@@ -29,23 +28,23 @@ in
     };
 
     apps = {
+      antigravity.enable = true;
       bun.enable = true;
       direnv.enable = true;
+
+      git = {
+        enable = true;
+        name = "Amal C.S";
+        email = "amal4cs@gmail.com";
+      };
+
+      mpv.enable = true;
       nodejs.enable = true;
       pavucontrol.enable = true;
       posting.enable = true;
       pwvucontrol.enable = true;
+      swayimg.enable = true;
     };
-  };
-
-  custom.apps = {
-
-    git.enable = true;
-
-    mpv.enable = true;
-
-    swayimg.enable = true;
-
   };
 
   home.packages = with pkgs; [
@@ -55,9 +54,4 @@ in
     papirus-icon-theme
   ];
 
-  xdg.configFile."pipewire/pipewire.conf.d/99-system.conf" =
-    lib.mkIf (builtins.pathExists pipewireConfigFile)
-      {
-        source = pipewireConfigFile;
-      };
 }

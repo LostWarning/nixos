@@ -8,6 +8,7 @@
     ./neovim/neovim.nix
     ./swayimg/swayimg.nix
 
+    ./antigravity.nix
     ./btop.nix
     ./bun.nix
     ./direnv.nix

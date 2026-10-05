@@ -1,4 +1,4 @@
-{ pkgs, username, ... }:
+{ pkgs, ... }:
 
 {
   programs.ssh = {
@@ -11,7 +11,7 @@
       "github.com" = {
         hostname = "github.com";
         user = "git";
-        identityFile = "/home/${username}/.ssh/id_ed25519";
+        identityFile = "/home/stranger/.ssh/id_ed25519";
       };
     };
   };

@@ -1,14 +1,12 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 
 let
   cfg = config.metronome.apps.kitty;
   isDefault = (config.metronome.defaults.terminal == "kitty");
-  isFishEnabled = (config.metronome.defaults.shell == "fish");
 in
 {
   options.metronome.apps.kitty = {
@@ -33,10 +31,7 @@ in
 
       themeFile = "tokyo_night_night";
 
-      shellIntegration.enableFishIntegration = isFishEnabled;
-
       extraConfig = builtins.readFile ./kitty.conf;
-
     };
   };
 }

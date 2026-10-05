@@ -5,10 +5,19 @@
   ...
 }:
 
+let
+  cfg = config.metronome.apps.mpv;
+in
 {
-  options.custom.apps.mpv.enable = lib.mkEnableOption "mpv";
+  options.metronome.apps.mpv = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "install mpv";
+    };
+  };
 
-  config = lib.mkIf config.custom.apps.mpv.enable {
+  config = lib.mkIf cfg.enable {
     programs.mpv = {
       enable = true;
       package = pkgs.mpv.override {

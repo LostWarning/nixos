@@ -1,12 +1,11 @@
 {
   config,
   pkgs,
-  username,
   ...
 }:
 
 let
-  sshDir = "/home/${username}/.ssh";
+  sshDir = "/home/stranger/.ssh";
   keyPath = "${sshDir}/id_ed25519";
 in
 {
@@ -17,17 +16,17 @@ in
 
     serviceConfig = {
       Type = "oneshot";
-      User = username;
+      User = "stranger";
       RemainAfterExit = true;
     };
 
     script = ''
       if [ ! -f "${keyPath}" ]; then
-        echo "Generating new Ed25519 SSH key for ${username}..."
+        echo "Generating new Ed25519 SSH key for stranger..."
         mkdir -p "${sshDir}"
         chmod 700 "${sshDir}"
         
-        ${pkgs.openssh}/bin/ssh-keygen -t ed25519 -C "${username}@${config.networking.hostName}" -f "${keyPath}" -N ""
+        ${pkgs.openssh}/bin/ssh-keygen -t ed25519 -C "stranger@${config.networking.hostName}" -f "${keyPath}" -N ""
         
         chmod 600 "${keyPath}"
         chmod 644 "${keyPath}.pub"

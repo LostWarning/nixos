@@ -27,75 +27,40 @@
       home-manager,
       ...
     }@inputs:
-    let
-      user = import ./users/stranger.nix;
-    in
     {
       nixosConfigurations = {
         desktop = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          specialArgs = {
-            inherit inputs;
-            username = user.username;
-          };
+          specialArgs = { inherit inputs; };
 
           modules = [
             ./hardware-configuration.nix
             ./hosts/desktop/configuration.nix
 
-            user.nixosModule
-
             home-manager.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = {
-                inherit inputs;
-                username = user.username;
-                fullName = user.fullName;
-                email = user.email;
-              };
-
-              home-manager.users.${user.username} = {
-                imports = [
-                  ./common/home.nix
-                  ./hosts/desktop/packages.nix
-                ];
-              };
+              home-manager.extraSpecialArgs = { inherit inputs; };
             }
+            ./hosts/desktop/users/stranger.nix
           ];
         };
         thinkpad-p16-gen2 = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          specialArgs = {
-            inherit inputs;
-            username = user.username;
-          };
+          specialArgs = { inherit inputs; };
 
           modules = [
             ./hosts/thinkpad-p16-gen2/hardware-configuration.nix
             ./hosts/thinkpad-p16-gen2/configuration.nix
 
-            user.nixosModule
-
             home-manager.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = {
-                inherit inputs;
-                username = user.username;
-                fullName = user.fullName;
-                email = user.email;
-              };
-
-              home-manager.users.${user.username} = {
-                imports = [
-                  ./common/home.nix
-                  ./hosts/thinkpad-p16-gen2/packages.nix
-                ];
-              };
+              home-manager.extraSpecialArgs = { inherit inputs; };
             }
+            ./hosts/thinkpad-p16-gen2/users/stranger
           ];
         };
       };

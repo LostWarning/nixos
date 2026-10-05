@@ -1,23 +1,49 @@
 {
   config,
   lib,
-  fullName,
-  email,
   ...
 }:
 
+let
+  cfg = config.metronome.apps.git;
+in
 {
-  options.custom.apps.git.enable = lib.mkEnableOption "Git";
+  options.metronome.apps.git = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "install git";
+    };
 
-  config = lib.mkIf config.custom.apps.git.enable {
+    name = lib.mkOption {
+      type = lib.types.str;
+      default = "";
+      description = "git config name";
+    };
+
+    email = lib.mkOption {
+      type = lib.types.str;
+      default = "";
+      description = "git config email";
+    };
+
+    defaultBranch = lib.mkOption {
+      type = lib.types.str;
+      default = "main";
+      description = "default branch name";
+    };
+
+  };
+
+  config = lib.mkIf cfg.enable {
     programs.git = {
       enable = true;
       settings = {
         user = {
-          name = fullName;
-          email = email;
+          name = cfg.name;
+          email = cfg.email;
         };
-        init.defaultBranch = "main";
+        init.defaultBranch = cfg.defaultBranch;
       };
     };
   };
