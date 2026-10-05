@@ -1,6 +1,10 @@
-{ pkgs, ... }:
+{
+  pkgs,
+  ...
+}:
 
 {
+
   users.users.stranger = {
     isNormalUser = true;
     description = "Amal C.S";
@@ -16,8 +20,16 @@
 
   home-manager.users.stranger = {
     imports = [
-      ../home.nix
+      ../../../../common/xdg.nix
+      ./packages.nix
     ];
+
+    home.username = "stranger";
+    home.homeDirectory = "/home/stranger";
+
+    programs.home-manager.enable = true;
+
+    home.stateVersion = "26.05";
 
   };
 }

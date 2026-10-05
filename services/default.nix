@@ -10,6 +10,7 @@
     ./ollama.nix
     ./pipewire.nix
     ./postgresql.nix
+    ./ssh.nix
     ./starship.nix
     ./steam.nix
   ];

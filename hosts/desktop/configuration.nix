@@ -9,78 +9,44 @@
     ../../common/nixos.nix
     ../../common/locale/india.nix
     ../../common/env_variables.nix
-    ../../common/packages.nix
     ../../common/services.nix
+    ../../common/fonts.nix
 
     ../../services
 
     ../../hardware/gpu/radeon.nix
+
+    ./networking.nix
     ./filesystem.nix
-    ./fonts.nix
 
     ../../modules
-
   ];
 
   boot.kernelPackages = pkgs.linuxPackages_zen;
 
   nixpkgs.config.allowUnfree = true;
 
-  networking.hostName = "desktop"; # Define your hostname.
+  environment.systemPackages = with pkgs; [
+    jq
+    wget
+    curl
+  ];
 
   metronome = {
-    display_manager = "greetd";
 
-    window_manager = "hyprland";
-
-    audio.backend = "pipewire";
-
-    terminal = {
-      emulator = "kitty";
+    defaults = {
+      display-manager = "greetd";
+      web-server = "nginx";
+      audio-backend = "pipewire";
       shell = "fish";
-      prompt = "starship";
+      shell-prompt = "starship";
     };
 
-    editors = {
-      neovim.enable = true;
-      default = "neovim";
-    };
-
-    file_explorer = {
-      nautilus.enable = true;
-    };
-
-    networking = {
-      http_server = {
-        enable = true;
-        backend = "nginx";
-      };
-    };
-
-    dev = {
-      cxx.enable = true;
-
-      typescript = {
-        enable = true;
-        nodejs.enable = true;
-        bun.enable = true;
-      };
-    };
-
-    containers = {
-      enable = true;
+    services = {
       docker.enable = true;
-    };
-
-    ai = {
-      enable = true;
-      engine = {
-        ollama.enable = true;
-      };
-    };
-
-    games = {
-      enable = true;
+      hyprland.enable = true;
+      ollama.enable = true;
+      ssh.enable = true;
       steam.enable = true;
     };
   };

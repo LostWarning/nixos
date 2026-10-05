@@ -10,18 +10,15 @@
     ../../common/locale/india.nix
     ../../common/env_variables.nix
     ../../common/services.nix
+    ../../common/fonts.nix
 
     ../../services
 
     ../../hardware/laptop/thinkpad/p16-gen2.nix
 
     ./networking.nix
-    ./fonts.nix
 
     ../../modules
-
-    ../../modules/defaults.nix
-
   ];
 
   hardware.graphics = {
@@ -56,14 +53,9 @@
       docker.enable = true;
       hyprland.enable = true;
       ollama.enable = false;
+      ssh.enable = true;
       steam.enable = false;
     };
-
-    editors = {
-      neovim.enable = true;
-      default = "neovim";
-    };
-
   };
 
   # Configure keymap in X11

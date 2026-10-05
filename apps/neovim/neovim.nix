@@ -1,37 +1,51 @@
 {
-  osConfig,
+  config,
   pkgs,
   lib,
   ...
 }:
 
+let
+  cfg = config.metronome.apps.nvim;
+  isDefault = (config.metronome.defaults.text-editor == "nvim");
+in
+
 {
-  programs.neovim = lib.mkIf osConfig.metronome.editors.neovim.enable {
-    enable = true;
-    defaultEditor = true;
+  options.metronome.apps.nvim = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = isDefault;
+      description = "install nvim";
+    };
+  };
+  config = lib.mkIf cfg.enable {
+    programs.neovim = {
+      enable = true;
+      defaultEditor = true;
 
-    plugins = with pkgs.vimPlugins; [
-      direnv-vim
-      nvim-lspconfig
-    ];
+      plugins = with pkgs.vimPlugins; [
+        direnv-vim
+        nvim-lspconfig
+      ];
 
-    extraPackages = with pkgs; [
+      extraPackages = with pkgs; [
 
-      # Lua
-      lua-language-server
-      stylua
+        # Lua
+        lua-language-server
+        stylua
 
-      # nix
-      nil
+        # nix
+        nil
 
-      # Telescope Dependencies
-      ripgrep
-      fd
+        # Telescope Dependencies
+        ripgrep
+        fd
 
-      tree-sitter
+        tree-sitter
 
-    ];
+      ];
 
-    initLua = builtins.readFile ./init.lua;
+      initLua = builtins.readFile ./init.lua;
+    };
   };
 }
