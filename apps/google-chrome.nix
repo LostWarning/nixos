@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  username,
   ...
 }:
 
@@ -20,10 +19,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home-manager.users.${username} = {
-      programs.google-chrome = {
-        enable = true;
-      };
+    programs.google-chrome = {
+      enable = true;
     };
   };
 }

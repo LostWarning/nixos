@@ -1,18 +1,23 @@
 {
   config,
   lib,
-  username,
   ...
 }:
 
 let
-  containers = config.metronome.containers;
+  cfg = config.metronome.services.docker;
 in
 {
-
-  config = lib.mkIf (containers.enable && containers.docker.enable) {
-    virtualisation.docker.enable = true;
-
-    users.users.${username}.extraGroups = [ "docker" ];
+  options.metronome.services.docker = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "enable docker";
+    };
   };
+
+  config = lib.mkIf cfg.enable {
+    virtualisation.docker.enable = true;
+  };
+
 }

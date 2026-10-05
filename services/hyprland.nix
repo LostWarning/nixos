@@ -5,8 +5,22 @@
   ...
 }:
 
+let
+  cfg = config.metronome.services.hyprland;
+  isDefault = (config.metronome.defaults.desktop-environment == "hyprland");
+in
+
 {
-  config = lib.mkIf (config.metronome.window_manager == "hyprland") {
+
+  options.metronome.services.hyprland = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = isDefault;
+      description = "enable hyprland desktop environment";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
     # Core Hyprland compositor
     programs.hyprland = {
       enable = true;

@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  username,
   ...
 }:
 let
@@ -17,10 +16,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home-manager.users.${username} = {
-      programs.bun = {
-        enable = true;
-      };
+    programs.bun = {
+      enable = true;
     };
   };
 }

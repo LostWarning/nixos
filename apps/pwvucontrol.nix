@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  username,
   ...
 }:
 
@@ -19,11 +18,9 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home-manager.users.${username} = {
-      home.packages = [
-        pkgs.pwvucontrol
-      ];
-    };
+    home.packages = [
+      pkgs.pwvucontrol
+    ];
   };
 
 }

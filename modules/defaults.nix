@@ -2,7 +2,7 @@
 
 {
   options.metronome.defaults = {
-    system_monitor = lib.mkOption {
+    system-monitor = lib.mkOption {
       type = lib.types.nullOr (lib.types.enum [ "btop" ]);
       default = null;
       description = "Default system monitor";
@@ -32,6 +32,28 @@
       );
       default = null;
       description = "Default file explorer";
+    };
+
+    shell = lib.mkOption {
+      type = lib.types.enum [
+        "bash"
+        "fish"
+        "zsh"
+      ];
+      default = "bash";
+      description = "Default shell";
+    };
+
+    shell-prompt = lib.mkOption {
+      type = lib.types.enum [ "starship" ];
+      default = "starship";
+      description = "Default shell prompt";
+    };
+
+    desktop-environment = lib.mkOption {
+      type = lib.types.nullOr (lib.types.enum [ "hyprland" ]);
+      default = null;
+      description = "Default desktop environment";
     };
   };
 }

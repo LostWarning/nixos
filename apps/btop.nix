@@ -1,13 +1,12 @@
 {
   config,
   lib,
-  username,
   ...
 }:
 
 let
   cfg = config.metronome.apps.btop;
-  isDefault = (config.metronome.defaults.system_monitor == "btop");
+  isDefault = (config.metronome.defaults.system-monitor == "btop");
 in
 {
   options.metronome.apps.btop = {
@@ -32,13 +31,11 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home-manager.users.${username} = {
-      programs.btop = {
-        enable = true;
-        settings = {
-          color_theme = cfg.color_theme;
-          theme_background = cfg.theme_background;
-        };
+    programs.btop = {
+      enable = true;
+      settings = {
+        color_theme = cfg.color_theme;
+        theme_background = cfg.theme_background;
       };
     };
   };

@@ -1,16 +1,26 @@
 {
   lib,
   pkgs,
-  osConfig,
+  config,
+  username,
   ...
 }:
 
 let
-  targetHost = osConfig.networking.hostName;
+  cfg = config.metronome.apps.hyprland;
+  isDefault = (config.metronome.defaults.desktop-environment == "hyprland");
 in
-
 {
-  config = lib.mkIf (osConfig.metronome.window_manager == "hyprland") {
+  options.metronome.apps.hyprland = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = isDefault;
+      description = "enable hyprland desktop environment";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+
     wayland.windowManager.hyprland = {
       enable = true;
       systemd.enable = false;

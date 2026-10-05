@@ -11,10 +11,41 @@ in
 
     ../../apps
 
+    ../../apps/hyprland/hyprland.nix
+    ../../apps/btop.nix
+    ../../apps/bun.nix
+    ../../apps/direnv.nix
+    ../../apps/google-chrome.nix
+    ../../apps/nautilus.nix
+    ../../apps/nodejs.nix
+    ../../apps/pavucontrol.nix
+    ../../apps/posting.nix
+    ../../apps/pwvucontrol.nix
+
     ../../packages/ssh.nix
+
+    ../../modules/defaults.nix
 
     ./theme.nix
   ];
+
+  metronome = {
+    defaults = {
+      desktop-environment = "hyprland";
+      system-monitor = "btop";
+      web-browser = "google-chrome";
+      file-explorer = "nautilus";
+    };
+
+    apps = {
+      bun.enable = true;
+      direnv.enable = true;
+      nodejs.enable = true;
+      pavucontrol.enable = true;
+      posting.enable = true;
+      pwvucontrol.enable = true;
+    };
+  };
 
   custom.apps = {
 

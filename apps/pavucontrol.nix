@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  username,
   ...
 }:
 let
@@ -19,8 +18,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home-manager.users.${username} = {
-      home.packages = [ pkgs.pavucontrol ];
-    };
+    home.packages = [ pkgs.pavucontrol ];
   };
 }

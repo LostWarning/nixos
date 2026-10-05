@@ -9,25 +9,19 @@
     ../../common/nixos.nix
     ../../common/locale/india.nix
     ../../common/env_variables.nix
-    ../../common/packages.nix
     ../../common/services.nix
 
     ../../services
 
     ../../hardware/laptop/thinkpad/p16-gen2.nix
+
+    ./networking.nix
     ./fonts.nix
 
     ../../modules
 
-    ../../apps/bun.nix
-    ../../apps/btop.nix
-    ../../apps/direnv.nix
-    ../../apps/google-chrome.nix
-    ../../apps/nautilus.nix
-    ../../apps/nodejs.nix
-    ../../apps/pavucontrol.nix
-    ../../apps/posting.nix
-    ../../apps/pwvucontrol.nix
+    ../../apps/fish.nix
+    ../../apps/starship.nix
 
     ../../modules/defaults.nix
 
@@ -45,28 +39,25 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  networking.hostName = "thinkpad-p16-gen2"; # Define your hostname.
+  environment.systemPackages = with pkgs; [
+    jq
+    wget
+    curl
+  ];
 
   metronome = {
 
     defaults = {
-      file-explorer = "nautilus";
-      system_monitor = "btop";
-      web-browser = "google-chrome";
+      shell = "fish";
+      shell-prompt = "starship";
     };
 
-    apps = {
-      bun.enable = true;
-      direnv.enable = true;
-      nodejs.enable = true;
-      pavucontrol.enable = true;
-      posting.enable = true;
-      pwvucontrol.enable = true;
+    services = {
+      docker.enable = true;
+      hyprland.enable = true;
     };
 
     display_manager = "greetd";
-
-    window_manager = "hyprland";
 
     audio.backend = "pipewire";
 
@@ -86,11 +77,6 @@
         enable = true;
         backend = "nginx";
       };
-    };
-
-    containers = {
-      enable = true;
-      docker.enable = true;
     };
 
     ai = {

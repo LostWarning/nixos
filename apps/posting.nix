@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  username,
   ...
 }:
 
@@ -33,13 +32,11 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home-manager.users.${username} = {
-      home.packages = [ pkgs.posting ];
+    home.packages = [ pkgs.posting ];
 
-      xdg.configFile."posting/config.yaml".text = ''
-        theme: "${cfg.color-theme}"
-        editor: "${cfg.editor}"
-      '';
-    };
+    xdg.configFile."posting/config.yaml".text = ''
+      theme: "${cfg.color-theme}"
+      editor: "${cfg.editor}"
+    '';
   };
 }

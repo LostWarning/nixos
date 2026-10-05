@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  username,
   ...
 }:
 
@@ -21,8 +20,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home-manager.users.${username} = {
-      home.packages = [ pkgs.nautilus ];
-    };
+    home.packages = [ pkgs.nautilus ];
   };
 }

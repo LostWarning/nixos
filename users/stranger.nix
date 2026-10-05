@@ -4,8 +4,11 @@ rec {
   email = "amal4cs@gmail.com";
 
   nixosModule =
-    { pkgs, ... }:
+    { config, pkgs, ... }:
 
+    let
+      shell = if (config.metronome.defaults.shell == "fish") then pkgs.fish else pkgs.bash;
+    in
     {
       users.users.${username} = {
         isNormalUser = true;
@@ -14,8 +17,9 @@ rec {
           "audio"
           "networkmanager"
           "wheel"
+          "docker"
         ];
-        shell = pkgs.fish;
+        shell = shell;
       };
     };
 }

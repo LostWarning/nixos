@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  username,
   ...
 }:
 
@@ -18,13 +17,11 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home-manager.users.${username} = {
-      programs.direnv = {
-        enable = true;
-        enableBashIntegration = true;
-        enableFishIntegration = true;
-        nix-direnv.enable = true;
-      };
+    programs.direnv = {
+      enable = true;
+      enableBashIntegration = true;
+      enableFishIntegration = true;
+      nix-direnv.enable = true;
     };
   };
 }

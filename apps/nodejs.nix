@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  username,
   ...
 }:
 let
@@ -18,8 +17,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home-manager.users.${username} = {
-      home.packages = [ pkgs.nodejs ];
-    };
+    home.packages = [ pkgs.nodejs ];
   };
 }
