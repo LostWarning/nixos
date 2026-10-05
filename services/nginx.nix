@@ -1,10 +1,19 @@
 { lib, config, ... }:
 
 let
-  http_server = config.metronome.networking.http_server;
+  cfg = config.metronome.services.nginx;
+  isDefault = (config.metronome.defaults.web-server == "nginx");
 in
 {
-  config = lib.mkIf (http_server.enable && http_server.backend == "nginx") {
+  options.metronome.services.nginx = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = isDefault;
+      description = "Enable nginx web server";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
 
     services.nginx = {
       enable = true;
@@ -38,11 +47,5 @@ in
       # Append raw global configuration from a local file if needed:
       # appendHttpConfig = builtins.readFile ./nginx/nginx.conf;
     };
-
-    # Open HTTP/HTTPS ports
-    networking.firewall.allowedTCPPorts = [
-      80
-      443
-    ];
   };
 }

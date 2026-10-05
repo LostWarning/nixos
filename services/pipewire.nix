@@ -5,11 +5,20 @@
 }:
 
 let
-  configFileSource = ../hosts/desktop/pipewire/99-2.1-crossover.conf;
+  cfg = config.metronome.services.pipewire;
+  isDefault = (config.metronome.defaults.audio-backend == "pipewire");
 in
 
 {
-  config = lib.mkIf (config.metronome.audio.backend == "pipewire") {
+  options.metronome.services.pipewire = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = isDefault;
+      description = "Enable pipewire";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
 
     services.pulseaudio.enable = false;
 

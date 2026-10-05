@@ -4,10 +4,21 @@
   config,
   ...
 }:
-
+let
+  cfg = config.metronome.services.greetd;
+  isDefault = (config.metronome.defaults.display-manager == "greetd");
+in
 {
 
-  config = lib.mkIf (config.metronome.display_manager == "greetd") {
+  options.metronome.services.greetd = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = isDefault;
+      description = "Enable greetd display manager";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
 
     services.greetd = {
       enable = true;

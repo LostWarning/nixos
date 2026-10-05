@@ -1,11 +1,18 @@
 { config, lib, ... }:
 
 let
-  games = config.metronome.games;
+  cfg = config.metronome.services.steam;
 in
 {
+  options.metronome.services.steam = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable steam";
+    };
+  };
 
-  config = lib.mkIf (games.enable && games.steam.enable) {
+  config = lib.mkIf cfg.enable {
     programs.steam = {
       enable = true;
       gamescopeSession.enable = true;

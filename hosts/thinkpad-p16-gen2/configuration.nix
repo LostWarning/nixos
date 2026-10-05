@@ -48,42 +48,25 @@
   metronome = {
 
     defaults = {
+      display-manager = "greetd";
       shell = "fish";
       shell-prompt = "starship";
+      web-server = "nginx";
+      audio-backend = "pipewire";
     };
 
     services = {
       docker.enable = true;
       hyprland.enable = true;
+      ollama.enable = false;
+      steam.enable = false;
     };
-
-    display_manager = "greetd";
-
-    audio.backend = "pipewire";
 
     editors = {
       neovim.enable = true;
       default = "neovim";
     };
 
-    networking = {
-      http_server = {
-        enable = true;
-        backend = "nginx";
-      };
-    };
-
-    ai = {
-      enable = false;
-      engine = {
-        ollama.enable = false;
-      };
-    };
-
-    games = {
-      enable = false;
-      steam.enable = false;
-    };
   };
 
   # Configure keymap in X11

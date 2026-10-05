@@ -6,10 +6,18 @@
 }:
 
 let
-  ai = config.metronome.ai;
+  cfg = config.metronome.services.ollama;
 in
 {
-  config = lib.mkIf (ai.enable && ai.engine.ollama.enable) {
+  options.metronome.services.ollama = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable ollama";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
     services.ollama = {
       enable = true;
       host = "127.0.0.1";

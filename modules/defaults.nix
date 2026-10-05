@@ -55,5 +55,23 @@
       default = null;
       description = "Default desktop environment";
     };
+
+    display-manager = lib.mkOption {
+      type = lib.types.enum [ "greetd" ];
+      default = "greetd";
+      description = "Default display manager";
+    };
+
+    web-server = lib.mkOption {
+      type = lib.types.nullOr (lib.types.enum [ "nginx" ]);
+      default = null;
+      description = "Default web server";
+    };
+
+    audio-backend = lib.mkOption {
+      type = lib.types.nullOr (lib.types.enum [ "pipewire" ]);
+      default = null;
+      description = "Default audio backend";
+    };
   };
 }

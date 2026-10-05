@@ -1,7 +1,0 @@
-{ ... }:
-
-{
-  imports = [
-    ./http-server.nix
-  ];
-}
