@@ -40,7 +40,7 @@ Metronome is a **declarative, role-driven, and multi-user ready** NixOS configur
   - `desktop` (workstation)
   - Each host has its machine-level `configuration.nix` and user-level `users/<username>/packages.nix`.
 - **`common/`**: Universal system baselines: fonts ([`common/fonts.nix`](file:///etc/nixos/common/fonts.nix)), locales, bootloader, weekly garbage collection.
-- **`hardware/`**: Reusable hardware, kernel, and GPU driver profiles (e.g., AMD GPU, laptop power management).
+- **`hardware/`**: Modular hardware modules and vendor graphics drivers managed via `metronome.hardware.gpu = "intel" | "amd"`, alongside machine-specific hardware profiles (`hardware/laptop/thinkpad/p16-gen2.nix`).
 
 ---
 

@@ -90,17 +90,19 @@ flowchart TD
 - **`common/`**:
   Universal settings shared across every machine: bootloader, weekly garbage collection, system fonts (JetBrainsMono, Noto Emoji), session variables, and locales.
 - **`hardware/`**:
-  Modular driver profiles (e.g., AMD GPU with Mesa, Vulkan, and OpenCL).
+  Modular hardware and GPU driver configurations (`metronome.hardware.gpu = "intel" | "amd"`), alongside machine-specific hardware profiles (fans, TLP, kernel modules).
 
 ---
 
 ## 🎯 How Metronome Works in Practice
 
 ### 1. Machine Capabilities (`hosts/<host>/configuration.nix`)
-In the host configuration, you declare system-wide services and machine defaults:
+In the host configuration, you declare GPU acceleration, system-wide services, and machine defaults:
 
 ```nix
 metronome = {
+  hardware.gpu = "intel";   # or "amd" — automatically configures VA-API, OpenCL, and diagnostic tools
+
   defaults = {
     display-manager = "greetd";
     web-server = "nginx";

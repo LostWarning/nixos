@@ -5,7 +5,6 @@
 
 {
   imports = [
-
     ../../common/nixos.nix
     ../../common/locale/india.nix
     ../../common/env_variables.nix
@@ -13,8 +12,7 @@
     ../../common/fonts.nix
 
     ../../services
-
-    ../../hardware/gpu/radeon.nix
+    ../../hardware
 
     ./networking.nix
     ./filesystem.nix
@@ -33,6 +31,7 @@
   ];
 
   metronome = {
+    hardware.gpu = "amd";
 
     defaults = {
       display-manager = "greetd";

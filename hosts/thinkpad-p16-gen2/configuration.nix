@@ -5,7 +5,6 @@
 
 {
   imports = [
-
     ../../common/nixos.nix
     ../../common/locale/india.nix
     ../../common/env_variables.nix
@@ -13,6 +12,7 @@
     ../../common/fonts.nix
 
     ../../services
+    ../../hardware
 
     ../../hardware/laptop/thinkpad/p16-gen2.nix
 
@@ -20,14 +20,6 @@
 
     ../../profiles/defaults.nix
   ];
-
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-    extraPackages = with pkgs; [
-      mesa.opencl
-    ];
-  };
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
@@ -40,6 +32,7 @@
   ];
 
   metronome = {
+    hardware.gpu = "intel";
 
     defaults = {
       display-manager = "greetd";
@@ -52,9 +45,7 @@
     services = {
       docker.enable = true;
       hyprland.enable = true;
-      ollama.enable = false;
       ssh.enable = true;
-      steam.enable = false;
     };
   };
 
