@@ -156,30 +156,25 @@ metronome = {
 ```
 
 ### 3. Desktop Appearance & Theming (`metronome.theme`)
-Metronome abstracts desktop appearance (GTK themes, icon packs, and dconf dark/light mode preferences) through the `metronome.theme` module in [`common/theme.nix`](file:///etc/nixos/common/theme.nix), ensuring a consistent look and feel across window managers (Hyprland) and desktop environments (GNOME, KDE) without touching raw dconf schema strings.
+Metronome provides a unified theming engine in [`common/theme.nix`](file:///etc/nixos/common/theme.nix). Rather than specifying low-level toolkit options (`gtk.*`, `qt.*`, `dconf.*`, `home.pointerCursor.*`), you declare high-level intent using Metronome theme tokens. Metronome automatically maps them to GTK 3/4, Qt (via GTK3 platform plugin), cursor engines (Hyprcursor, X11, Wayland), and dconf.
 
 **Default settings applied automatically:**
-* **Color scheme:** `prefer-dark`
-* **GTK theme:** `Adwaita-dark` (`gnome-themes-extra`)
-* **Icon theme:** `Papirus-Dark` (`papirus-icon-theme`)
+* **Theme (`name`):** `adwaita-dark` (maps to `Adwaita-dark` GTK theme + `prefer-dark` color scheme)
+* **Icons (`icons`):** `papirus-dark` (maps to `Papirus-Dark` icon theme from `papirus-icon-theme`)
+* **Cursor (`cursor`):** `nordzy` (maps to `Nordzy-cursors` for GTK/X11, `Nordzy-hyprcursors` for Hyprcursor from `nordzy-cursor-theme`)
+* **Cursor Size (`cursor-size`):** `24`
+* **Qt integration:** Automatically configured with `platformTheme.name = "gtk3"` to match the desktop GTK theme
 * **Nautilus view:** Icon view, directories sorted first
 
 **Customizing / overriding themes per user:**
-Users can override any setting in their `packages.nix` or `users/<user>/theme.nix`:
+Users can override any theme preset in their `packages.nix` or `users/<user>/theme.nix`:
 
 ```nix
 metronome.theme = {
-  color-scheme = "prefer-dark"; # "prefer-dark" | "prefer-light" | "default"
-
-  gtk = {
-    name = "Tokyonight-Dark-BL";
-    # package = pkgs.my-custom-gtk-theme; # optional
-  };
-
-  iconTheme = {
-    name = "Papirus-Dark";
-    # package = pkgs.papirus-icon-theme; # optional
-  };
+  name = "tokyo-night";  # Presets: "adwaita-dark", "adwaita-light", "tokyo-night", "nord"
+  icons = "papirus-dark"; # Presets: "papirus-dark", "papirus-light", "adwaita"
+  cursor = "nordzy";      # Presets: "nordzy", "adwaita"
+  cursor-size = 24;
 };
 ```
 

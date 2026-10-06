@@ -7,66 +7,157 @@
 
 let
   cfg = config.metronome.theme;
+
+  themeMap = {
+    "adwaita-dark" = {
+      gtk = {
+        name = "Adwaita-dark";
+        package = pkgs.gnome-themes-extra;
+      };
+      color-scheme = "prefer-dark";
+    };
+    "adwaita-light" = {
+      gtk = {
+        name = "Adwaita";
+        package = pkgs.gnome-themes-extra;
+      };
+      color-scheme = "prefer-light";
+    };
+    "tokyo-night" = {
+      gtk = {
+        name = "Tokyonight-Dark-BL";
+        package = pkgs.tokyonight-gtk-theme;
+      };
+      color-scheme = "prefer-dark";
+    };
+    "nord" = {
+      gtk = {
+        name = "Nordic";
+        package = pkgs.nordic;
+      };
+      color-scheme = "prefer-dark";
+    };
+  };
+
+  iconMap = {
+    "papirus-dark" = {
+      name = "Papirus-Dark";
+      package = pkgs.papirus-icon-theme;
+    };
+    "papirus-light" = {
+      name = "Papirus-Light";
+      package = pkgs.papirus-icon-theme;
+    };
+    "adwaita" = {
+      name = "Adwaita";
+      package = pkgs.adwaita-icon-theme;
+    };
+  };
+
+  cursorMap = {
+    "nordzy" = {
+      name = "Nordzy-cursors";
+      hyprcursor = "Nordzy-hyprcursors";
+      package = pkgs.nordzy-cursor-theme;
+    };
+    "adwaita" = {
+      name = "Adwaita";
+      hyprcursor = "Adwaita";
+      package = pkgs.adwaita-icon-theme;
+    };
+  };
+
+  currentTheme = themeMap.${cfg.name} or {
+    gtk = {
+      name = cfg.name;
+      package = null;
+    };
+    color-scheme = "prefer-dark";
+  };
+
+  currentIcon = iconMap.${cfg.icons} or {
+    name = cfg.icons;
+    package = null;
+  };
+
+  currentCursor = cursorMap.${cfg.cursor} or {
+    name = cfg.cursor;
+    hyprcursor = cfg.cursor;
+    package = null;
+  };
 in
 {
   options.metronome.theme = {
-    enable = lib.mkEnableOption "Metronome desktop theme management" // {
+    enable = lib.mkEnableOption "Metronome unified theme management" // {
       default = true;
     };
 
-    color-scheme = lib.mkOption {
-      type = lib.types.enum [
-        "prefer-dark"
-        "prefer-light"
-        "default"
-      ];
-      default = "prefer-dark";
-      description = "Color scheme preference (dark/light mode)";
+    name = lib.mkOption {
+      type = lib.types.str;
+      default = "adwaita-dark";
+      description = "Desktop theme preset (e.g. adwaita-dark, adwaita-light, tokyo-night, nord)";
     };
 
-    gtk = {
-      name = lib.mkOption {
-        type = lib.types.str;
-        default = "Adwaita-dark";
-        description = "GTK theme name";
-      };
-      package = lib.mkOption {
-        type = lib.types.nullOr lib.types.package;
-        default = pkgs.gnome-themes-extra;
-        description = "GTK theme package";
-      };
+    icons = lib.mkOption {
+      type = lib.types.str;
+      default = "papirus-dark";
+      description = "Icon theme preset (e.g. papirus-dark, papirus-light, adwaita)";
     };
 
-    iconTheme = {
-      name = lib.mkOption {
-        type = lib.types.str;
-        default = "Papirus-Dark";
-        description = "Icon theme name";
-      };
-      package = lib.mkOption {
-        type = lib.types.nullOr lib.types.package;
-        default = pkgs.papirus-icon-theme;
-        description = "Icon theme package";
-      };
+    cursor = lib.mkOption {
+      type = lib.types.str;
+      default = "nordzy";
+      description = "Cursor theme preset (e.g. nordzy, adwaita)";
+    };
+
+    cursor-size = lib.mkOption {
+      type = lib.types.int;
+      default = 24;
+      description = "Cursor size in pixels";
     };
   };
 
   config = lib.mkIf cfg.enable {
+    # GTK styling
     gtk = {
       enable = true;
       theme = {
-        name = cfg.gtk.name;
-        package = cfg.gtk.package;
+        name = currentTheme.gtk.name;
+        package = currentTheme.gtk.package;
       };
       iconTheme = {
-        name = cfg.iconTheme.name;
-        package = cfg.iconTheme.package;
+        name = currentIcon.name;
+        package = currentIcon.package;
       };
     };
 
+    # Qt styling: follows GTK
+    qt = {
+      enable = true;
+      platformTheme.name = "gtk3";
+    };
+
+    # Cursor management for X11, Wayland, GTK, and Hyprland
+    home.pointerCursor = {
+      enable = true;
+      name = currentCursor.name;
+      package = currentCursor.package;
+      size = cfg.cursor-size;
+      gtk.enable = true;
+      x11.enable = true;
+      hyprcursor.enable = true;
+    };
+
+    home.sessionVariables = {
+      HYPRCURSOR_THEME = lib.mkForce currentCursor.hyprcursor;
+    };
+
+    # Desktop portal & GNOME dconf settings
     dconf.settings = {
       "org/gnome/desktop/interface" = {
-        color-scheme = cfg.color-scheme;
+        color-scheme = currentTheme.color-scheme;
+        cursor-theme = currentCursor.name;
+        cursor-size = cfg.cursor-size;
       };
       "org/gnome/nautilus/preferences" = {
         default-folder-viewer = "icon-view";

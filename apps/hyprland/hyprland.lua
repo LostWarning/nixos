@@ -53,7 +53,6 @@ local fileManagerCmd = (fileManager == "yazi") and (terminal .. " -e " .. fileMa
 --
 hl.on("hyprland.start", function()
 	hl.exec_cmd("quickshell")
-	hl.exec_cmd("hyprctl setcursor Nordzy-hyprcursors 24")
 end)
 
 -------------------------------
@@ -61,18 +60,12 @@ end)
 -------------------------------
 
 -- See https://wiki.hypr.land/Configuring/Advanced-and-Cool/Environment-variables/
-
-hl.env("HYPRCURSOR_THEME", "Nordzy-hyprcursors")
-hl.env("HYPRCURSOR_SIZE", "24")
-hl.env("XCURSOR_THEME", "Nordzy-cursors")
-hl.env("XCURSOR_SIZE", "24")
+-- Cursor environment variables (HYPRCURSOR_THEME, HYPRCURSOR_SIZE, XCURSOR_THEME, XCURSOR_SIZE)
+-- are managed globally by Metronome (metronome.theme in common/theme.nix).
 
 hl.cursor = {
 	enable_hyprcursor = true,
 }
-
---hl.env("XCURSOR_SIZE", "24")
---hl.env("HYPRCURSOR_SIZE", "24")
 
 -----------------------
 ----- PERMISSIONS -----

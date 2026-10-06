@@ -129,7 +129,6 @@ in
 
     home.packages = with pkgs; [
       hyprcursor
-      nordzy-cursor-theme
       hyprshot
       wl-clipboard
 
