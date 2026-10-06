@@ -42,11 +42,19 @@ hl.config({
 ---- MY PROGRAMS ----
 ---------------------
 
--- Set programs that you use
-local terminal = "kitty"
-local fileManager = "nautilus"
-local webBrowser = "google-chrome"
+local ok, defaults = pcall(require, "defaults")
+if not ok then
+	defaults = {}
+end
+
+-- Set programs based on metronome.defaults (with fallbacks)
+local terminal = defaults.terminal or "kitty"
+local fileManager = defaults.fileManager or "nautilus"
+local webBrowser = defaults.webBrowser or "google-chrome"
 local menu = "hyprlauncher"
+
+-- Handle CLI file managers (like yazi) if selected as default
+local fileManagerCmd = (fileManager == "yazi") and (terminal .. " -e " .. fileManager) or fileManager
 
 -------------------
 ---- AUTOSTART ----
@@ -199,9 +207,9 @@ hl.animation({ leaf = "zoomFactor", enabled = true, speed = 7, bezier = "quick" 
 --     rounding    = 0,
 -- })
 
--- Zero out border size or match border color to Kitty's background
+-- Zero out border size or match border color to default terminal's background
 hl.window_rule({
-	match = { class = "kitty" },
+	match = { class = terminal },
 	border_size = 0,
 })
 
@@ -281,7 +289,7 @@ local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 -- Example binds, see https://wiki.hypr.land/Configuring/Basics/Binds/ for more
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(webBrowser))
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
+hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManagerCmd))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + space", hl.dsp.exec_cmd("qs ipc call launcher toggle"))
 
