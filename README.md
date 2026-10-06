@@ -88,7 +88,7 @@ flowchart TD
 - **`hosts/`**:
   Contains distinct machine profiles (`desktop`, `thinkpad-p16-gen2`). Each host defines its hardware/networking in `configuration.nix` and manages user accounts and Home Manager profiles under `users/<username>/`.
 - **`common/`**:
-  Universal settings shared across every machine: bootloader, weekly garbage collection, system fonts (JetBrainsMono, Noto Emoji), session variables, and locales.
+  Universal settings shared across every machine: bootloader, weekly garbage collection, system fonts (JetBrainsMono, Noto Emoji), session variables, locales, and unified user theming ([`common/theme.nix`](file:///etc/nixos/common/theme.nix)).
 - **`hardware/`**:
   Modular hardware and GPU driver configurations (`metronome.hardware.gpu = "intel" | "amd"`), alongside machine-specific hardware profiles (fans, TLP, kernel modules).
 
@@ -151,6 +151,34 @@ metronome = {
       name = "Amal C.S";
       email = "amal4cs@gmail.com";
     };
+  };
+};
+```
+
+### 3. Desktop Appearance & Theming (`metronome.theme`)
+Metronome abstracts desktop appearance (GTK themes, icon packs, and dconf dark/light mode preferences) through the `metronome.theme` module in [`common/theme.nix`](file:///etc/nixos/common/theme.nix), ensuring a consistent look and feel across window managers (Hyprland) and desktop environments (GNOME, KDE) without touching raw dconf schema strings.
+
+**Default settings applied automatically:**
+* **Color scheme:** `prefer-dark`
+* **GTK theme:** `Adwaita-dark` (`gnome-themes-extra`)
+* **Icon theme:** `Papirus-Dark` (`papirus-icon-theme`)
+* **Nautilus view:** Icon view, directories sorted first
+
+**Customizing / overriding themes per user:**
+Users can override any setting in their `packages.nix` or `users/<user>/theme.nix`:
+
+```nix
+metronome.theme = {
+  color-scheme = "prefer-dark"; # "prefer-dark" | "prefer-light" | "default"
+
+  gtk = {
+    name = "Tokyonight-Dark-BL";
+    # package = pkgs.my-custom-gtk-theme; # optional
+  };
+
+  iconTheme = {
+    name = "Papirus-Dark";
+    # package = pkgs.papirus-icon-theme; # optional
   };
 };
 ```
