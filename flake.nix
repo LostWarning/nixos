@@ -27,41 +27,43 @@
       home-manager,
       ...
     }@inputs:
+    let
+      mkHost =
+        {
+          host,
+          system ? "x86_64-linux",
+          users ? [ "stranger" ],
+          extraModules ? [ ],
+        }:
+        nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = { inherit inputs; };
+
+          modules = [
+            ./hosts/${host}/hardware-configuration.nix
+            ./hosts/${host}/configuration.nix
+
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.extraSpecialArgs = { inherit inputs; };
+            }
+          ]
+          ++ (map (user: ./hosts/${host}/users/${user}) users)
+          ++ extraModules;
+        };
+    in
     {
       nixosConfigurations = {
-        desktop = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit inputs; };
-
-          modules = [
-            ./hosts/desktop/hardware-configuration.nix
-            ./hosts/desktop/configuration.nix
-
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = { inherit inputs; };
-            }
-            ./hosts/desktop/users/stranger
-          ];
+        desktop = mkHost {
+          host = "desktop";
+          users = [ "stranger" ];
         };
-        thinkpad-p16-gen2 = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit inputs; };
 
-          modules = [
-            ./hosts/thinkpad-p16-gen2/hardware-configuration.nix
-            ./hosts/thinkpad-p16-gen2/configuration.nix
-
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = { inherit inputs; };
-            }
-            ./hosts/thinkpad-p16-gen2/users/stranger
-          ];
+        thinkpad-p16-gen2 = mkHost {
+          host = "thinkpad-p16-gen2";
+          users = [ "stranger" ];
         };
       };
     };
