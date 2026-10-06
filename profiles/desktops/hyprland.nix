@@ -22,10 +22,12 @@ in
       file-explorer = lib.mkDefault "nautilus";
       system-monitor = lib.mkDefault "btop";
       text-editor = lib.mkDefault "nvim";
+      shell = lib.mkDefault "fish";
     };
 
     # 2. Companion tools that make Hyprland a complete desktop
     metronome.apps = {
+      fish.enable = lib.mkDefault true;
       quickshell.enable = lib.mkDefault true;
       swayimg.enable = lib.mkDefault true;
       pavucontrol.enable = lib.mkDefault true;

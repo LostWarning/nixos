@@ -1,4 +1,9 @@
-{ lib, ... }:
+{
+  lib,
+  config,
+  options,
+  ...
+}:
 
 {
   options.metronome.defaults = {
@@ -80,8 +85,22 @@
         "vim"
         "nano"
       ];
-      default = "nano";
+      default = "nvim";
       description = "Default text editor";
     };
+  };
+
+  config = lib.optionalAttrs (options ? home) {
+    home.sessionVariables =
+      {
+        EDITOR = config.metronome.defaults.text-editor;
+        VISUAL = config.metronome.defaults.text-editor;
+      }
+      // (lib.optionalAttrs (config.metronome.defaults.terminal != null) {
+        TERMINAL = config.metronome.defaults.terminal;
+      })
+      // (lib.optionalAttrs (config.metronome.defaults.web-browser != null) {
+        BROWSER = config.metronome.defaults.web-browser;
+      });
   };
 }

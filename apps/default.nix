@@ -13,6 +13,7 @@
     ./bun.nix
     ./cpp.nix
     ./direnv.nix
+    ./fish.nix
     ./git.nix
     ./google-chrome.nix
     ./mpd.nix
