@@ -115,9 +115,18 @@ in
       default = 24;
       description = "Cursor size in pixels";
     };
+
+    hyprcursor = lib.mkOption {
+      type = lib.types.str;
+      default = currentCursor.hyprcursor;
+      description = "Active Hyprcursor theme name";
+    };
   };
 
   config = lib.mkIf cfg.enable {
+    # Ensure cursor package is installed for system-wide and desktop lookups
+    home.packages = lib.optional (currentCursor.package != null) currentCursor.package;
+
     # GTK styling
     gtk = {
       enable = true;

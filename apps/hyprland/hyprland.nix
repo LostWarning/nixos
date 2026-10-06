@@ -116,6 +116,18 @@ in
             else
               "nil"
           },
+          cursorTheme = ${
+            if (config ? metronome && config.metronome ? theme && config.metronome.theme.enable) then
+              ''"${config.metronome.theme.hyprcursor}"''
+            else
+              "nil"
+          },
+          cursorSize = ${
+            if (config ? metronome && config.metronome ? theme && config.metronome.theme.enable) then
+              toString config.metronome.theme.cursor-size
+            else
+              "nil"
+          },
         }
       '';
     }
