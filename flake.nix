@@ -34,7 +34,7 @@
           specialArgs = { inherit inputs; };
 
           modules = [
-            ./hardware-configuration.nix
+            ./hosts/desktop/hardware-configuration.nix
             ./hosts/desktop/configuration.nix
 
             home-manager.nixosModules.home-manager
