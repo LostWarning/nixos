@@ -22,6 +22,7 @@
     imports = [
       ../../../../common/xdg.nix
       ../../display.nix
+      ../../pipewire.nix
       ./packages.nix
       ./theme.nix
       ./display.nix
