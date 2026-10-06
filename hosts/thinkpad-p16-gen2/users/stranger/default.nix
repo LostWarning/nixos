@@ -19,6 +19,7 @@
   home-manager.users.stranger = {
     imports = [
       ../../../../common/xdg.nix
+      ../../../../common/theme.nix
       ../../display.nix
       ./packages.nix
       ./theme.nix
