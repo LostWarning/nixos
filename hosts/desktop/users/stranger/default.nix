@@ -23,6 +23,7 @@
       ../../../../common/xdg.nix
       ./packages.nix
       ./theme.nix
+      ./display.nix
     ];
 
     home.username = "stranger";

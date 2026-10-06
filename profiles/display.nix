@@ -1,7 +1,7 @@
 { lib, ... }:
 
 {
-  options.metronome.hardware.displays = lib.mkOption {
+  options.metronome.displays = lib.mkOption {
     type = lib.types.attrsOf (
       lib.types.submodule (
         { name, ... }:
@@ -84,6 +84,6 @@
       )
     );
     default = { };
-    description = "Physical display configurations for this machine";
+    description = "User display and monitor configuration";
   };
 }
