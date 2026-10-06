@@ -16,6 +16,7 @@
     };
 
     apps = {
+      hyprland.monitors = ../../monitors.lua;
       antigravity.enable = true;
       direnv.enable = true;
 
@@ -35,8 +36,6 @@
     brightnessctl
     networkmanagerapplet
     blueman
-    wl-clipboard
-    hyprshot
   ];
 
 }
