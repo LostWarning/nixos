@@ -28,7 +28,7 @@
       mpd.enable = true;
       mpv.enable = true;
       pipewire = {
-        configFile = ../../pipewire/99-2.1-crossover.conf;
+        configFile = ../../config/pipewire/99-2.1-crossover.conf;
       };
       posting.enable = true;
     };
