@@ -31,6 +31,12 @@ in
       default = false;
       description = "Enable ollama local LLM service";
     };
+
+    package = lib.mkOption {
+      type = lib.types.package;
+      default = defaultPackage;
+      description = "GPU-specific Ollama package to use. Auto selected based on metronome.hardware.gpu";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -39,7 +45,7 @@ in
       host = "127.0.0.1";
       port = 11434;
 
-      package = lib.mkDefault defaultPackage;
+      package = cfg.package;
     };
   };
 }
