@@ -7,10 +7,18 @@
 
 let
   cfg = config.metronome.apps.mpd;
+  audioBackend = config.metronome.defaults.audio-backend;
+  outputType = if audioBackend == "pulseaudio" then "pulse" else "pipewire";
+  outputName = if audioBackend == "pulseaudio" then "PulseAudio Sound Server" else "PipeWire Sound Server";
 in
 {
   options.metronome.apps.mpd = {
     enable = lib.mkEnableOption "MPD music daemon";
+    extraConfig = lib.mkOption {
+      type = lib.types.lines;
+      default = "";
+      description = "Extra configuration appended to mpd.conf";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -25,10 +33,11 @@ in
       playlistDirectory = "${config.home.homeDirectory}/Music/playlists";
 
       extraConfig = ''
-        audio_output {                                                                                                                                                                                                                                          
-          type  "pipewire"                                                                                                                                                                                                                                      
-          name  "PipeWire Sound Server"                                                                                                                                                                                                                         
-        }                                                                                                                                                                                                                                                       
+        audio_output {
+          type  "${outputType}"
+          name  "${outputName}"
+        }
+        ${cfg.extraConfig}
       '';
     };
 

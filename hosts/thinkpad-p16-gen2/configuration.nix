@@ -37,6 +37,7 @@
     networking.hostName = "thinkpad-p16-gen2";
 
     defaults = {
+      desktop-environment = "hyprland";
       display-manager = "greetd";
       web-server = "nginx";
       audio-backend = "pipewire";

@@ -37,6 +37,7 @@
     networking.hostName = "desktop";
 
     defaults = {
+      desktop-environment = "hyprland";
       display-manager = "greetd";
       web-server = "nginx";
       audio-backend = "pipewire";

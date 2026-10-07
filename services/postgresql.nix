@@ -2,31 +2,42 @@
   config,
   lib,
   pkgs,
-  username,
   ...
 }:
 
+let
+  cfg = config.metronome.services.postgresql;
+in
 {
-  options.custom.services.postgresql.enable = lib.mkEnableOption "PostgreSQL";
+  options.metronome.services.postgresql = {
+    enable = lib.mkEnableOption "PostgreSQL database service";
 
-  config = lib.mkIf config.custom.services.postgresql.enable {
+    package = lib.mkOption {
+      type = lib.types.package;
+      default = pkgs.postgresql_16;
+      description = "PostgreSQL package to use";
+    };
+
+    initialDatabases = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "Databases to ensure exist on startup";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
     services.postgresql = {
       enable = true;
-      package = pkgs.postgresql;
+      package = cfg.package;
 
       enableTCPIP = true;
       port = 5432;
 
-      ensureDatabases = [
-        username
-      ];
-
-      ensureUsers = [
-        {
-          name = username;
-          ensureDBOwnership = true;
-        }
-      ];
+      ensureDatabases = cfg.initialDatabases;
+      ensureUsers = map (db: {
+        name = db;
+        ensureDBOwnership = true;
+      }) cfg.initialDatabases;
 
       # Allow local Unix sockets via peer, and local TCP/IP via password (scram-sha-256)
       authentication = pkgs.lib.mkOverride 10 ''

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metronome Active System & Installed Status</title>
+  <style>
+    :root {
+      --bg: #1e1e2e;
+      --card-bg: #181825;
+      --header-bg: #11111b;
+      --text: #cdd6f4;
+      --text-muted: #a6adc8;
+      --border: #313244;
+      --accent: #cba6f7;
+      --accent-glow: rgba(203, 166, 247, 0.15);
+      --blue: #89b4fa;
+      --green: #a6e3a1;
+      --yellow: #f9e2af;
+      --peach: #fab387;
+      --red: #f38ba8;
+      --surface0: #313244;
+      --surface1: #45475a;
+      --code-bg: #11111b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 3rem;
+    }
+
+    /* Top Bar */
+    header {
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--accent);
+    }
+    .brand span { color: var(--text); font-weight: 400; font-size: 0.95rem; }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .nav-tab {
+      background: var(--surface0);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.45rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .nav-tab:hover { background: var(--surface1); color: var(--text); }
+    .nav-tab.active {
+      background: var(--accent);
+      color: #11111b;
+      border-color: var(--accent);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem;
+    }
+
+    /* Host Switcher */
+    .host-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .host-selector-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .selector-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .host-btn {
+      background: var(--surface0);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.45rem 1rem;
+      font-size: 0.9rem;
+      font-family: monospace;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .host-btn:hover { background: var(--surface1); }
+    .host-btn.active {
+      background: var(--blue);
+      color: #11111b;
+      font-weight: 700;
+      border-color: var(--blue);
+    }
+
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      margin-top: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .grid-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-bottom: 0.35rem;
+    }
+    .stat-value {
+      font-family: monospace;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--peach);
+    }
+    .stat-value.highlight-blue { color: var(--blue); }
+    .stat-value.highlight-green { color: var(--green); }
+
+    /* Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1rem;
+    }
+
+    .item-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      transition: border-color 0.15s;
+    }
+    .item-card:hover { border-color: var(--surface1); }
+
+    .card-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(49, 50, 68, 0.5);
+      padding-bottom: 0.5rem;
+    }
+
+    .card-name {
+      font-family: monospace;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .badge-on {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: rgba(166, 227, 161, 0.15);
+      color: var(--green);
+      border: 1px solid var(--green);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+    }
+
+    .prop-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      font-size: 0.85rem;
+    }
+
+    .prop-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .prop-k { color: var(--text-muted); }
+    .prop-v {
+      font-family: monospace;
+      color: var(--peach);
+      word-break: break-all;
+      text-align: right;
+    }
+
+    /* Badges Pill Row */
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .profile-pill {
+      background: rgba(203, 166, 247, 0.15);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 0.4rem 0.85rem;
+      border-radius: 9999px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    /* Packages Box */
+    .packages-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+
+    .pkg-search-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .pkg-search {
+      flex: 1;
+      background: var(--surface0);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 0.5rem 0.85rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .pkg-search:focus { border-color: var(--accent); }
+
+    .pkg-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      max-height: 340px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .pkg-tag {
+      background: var(--surface0);
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+    .pkg-tag.highlight { border-color: var(--accent); background: var(--surface1); color: var(--accent); }
+
+    .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      ⚙️ Metronome <span>System Dashboard</span>
+    </div>
+    <nav class="nav-tabs">
+      <a href="index.html" class="nav-tab">📖 Options Reference</a>
+      <a href="installed.html" class="nav-tab active">💻 Active System & Installed</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <!-- Host Switcher -->
+    <div class="host-bar">
+      <div class="host-selector-group">
+        <span class="selector-label">Target Host:</span>
+        <div id="hostButtons" style="display: flex; gap: 0.5rem;"></div>
+      </div>
+      <div id="statusMeta" style="font-size: 0.85rem; color: var(--text-muted);">
+        Evaluating system status...
+      </div>
+    </div>
+
+    <!-- Main Dashboard Container -->
+    <div id="dashboardContent">
+      <div class="empty-state">Loading installed configuration...</div>
+    </div>
+  </div>
+
+  <script>
+    let installedData = null;
+    let selectedHostKey = null;
+    let activePackageFilter = '';
+
+    async function init() {
+      try {
+        let res = await fetch('installed.json').catch(() => null);
+        if (!res || !res.ok) {
+          res = await fetch('docs/installed.json');
+        }
+        if (!res || !res.ok) throw new Error('installed.json not found');
+        installedData = await res.json();
+
+        const hostKeys = Object.keys(installedData.hosts);
+        if (hostKeys.length === 0) throw new Error('No hosts found');
+
+        setupHostSwitcher(hostKeys);
+        selectHost(hostKeys[0]);
+      } catch (err) {
+        document.getElementById('dashboardContent').innerHTML = `
+          <div class="empty-state">
+            <p>⚠️ Unable to load <code>installed.json</code>.</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">Run <code>make</code> or <code>make installed</code> to extract active system status.</p>
+          </div>
+        `;
+      }
+    }
+
+    function setupHostSwitcher(hostKeys) {
+      const container = document.getElementById('hostButtons');
+      container.innerHTML = '';
+
+      hostKeys.forEach(host => {
+        const btn = document.createElement('button');
+        btn.className = 'host-btn';
+        btn.textContent = host;
+        btn.onclick = () => selectHost(host);
+        container.appendChild(btn);
+      });
+    }
+
+    function selectHost(hostKey) {
+      selectedHostKey = hostKey;
+      document.querySelectorAll('.host-btn').forEach(b => {
+        b.classList.toggle('active', b.textContent === hostKey);
+      });
+      renderHostDashboard();
+    }
+
+    function renderHostDashboard() {
+      const host = installedData.hosts[selectedHostKey];
+      if (!host) return;
+
+      const user = host.users && host.users.stranger ? host.users.stranger : (Object.values(host.users)[0] || {});
+      const defaults = host.defaults || {};
+
+      document.getElementById('statusMeta').textContent =
+        `Host: ${host.hostName} · User: ${user.userName || 'default'}`;
+
+      const content = document.getElementById('dashboardContent');
+
+      // 1. Overview Grid
+      let html = `
+        <div class="section-title">🖥️ Core System & Hardware</div>
+        <div class="grid-overview">
+          <div class="stat-card">
+            <div class="stat-label">Hostname</div>
+            <div class="stat-value highlight-blue">${host.hostName}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">GPU Acceleration</div>
+            <div class="stat-value highlight-green">${(host.gpu || 'none').toUpperCase()}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Desktop Environment</div>
+            <div class="stat-value">${defaults['desktop-environment'] || 'None'}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Display Manager</div>
+            <div class="stat-value">${defaults['display-manager'] || 'None'}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Audio Backend</div>
+            <div class="stat-value highlight-blue">${defaults['audio-backend'] || 'None'}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Default Shell</div>
+            <div class="stat-value">${defaults['shell'] || 'bash'}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Default Terminal</div>
+            <div class="stat-value">${user.defaults?.terminal || defaults['terminal'] || 'kitty'}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Default Editor</div>
+            <div class="stat-value">${user.defaults?.['text-editor'] || defaults['text-editor'] || 'nvim'}</div>
+          </div>
+        </div>
+      `;
+
+      // 2. Active Profiles
+      if (user.profiles) {
+        const activeProfiles = [];
+        if (user.profiles.desktops?.hyprland?.enable) activeProfiles.push('desktops.hyprland');
+        if (user.profiles.dev?.cpp?.enable) activeProfiles.push('dev.cpp');
+        if (user.profiles.dev?.node?.enable) activeProfiles.push('dev.node');
+
+        if (activeProfiles.length) {
+          html += `
+            <div class="section-title">🚀 Active Workflow Profiles</div>
+            <div class="pill-group">
+              ${activeProfiles.map(p => `<span class="profile-pill">metronome.profiles.${p}</span>`).join('')}
+            </div>
+          `;
+        }
+      }
+
+      // 3. Displays Configuration
+      if (user.displays && Object.keys(user.displays).length > 0) {
+        html += `
+          <div class="section-title">🖥️ Monitor Outputs</div>
+          <div class="cards-grid">
+            ${Object.entries(user.displays).map(([outName, d]) => `
+              <div class="item-card">
+                <div class="card-title-row">
+                  <span class="card-name">${outName}</span>
+                  ${d.primary ? '<span class="badge-on" style="color: var(--yellow); border-color: var(--yellow);">Primary</span>' : ''}
+                </div>
+                <div class="prop-list">
+                  <div class="prop-row"><span class="prop-k">Mode / Refresh:</span><span class="prop-v">${d.mode}</span></div>
+                  <div class="prop-row"><span class="prop-k">Scale:</span><span class="prop-v">${d.scale}x</span></div>
+                  <div class="prop-row"><span class="prop-k">Position:</span><span class="prop-v">${d.position}</span></div>
+                  ${d.vrr ? `<div class="prop-row"><span class="prop-k">VRR:</span><span class="prop-v">Mode ${d.vrr}</span></div>` : ''}
+                  ${d.workspaces && d.workspaces.length ? `<div class="prop-row"><span class="prop-k">Workspaces:</span><span class="prop-v">${d.workspaces.join(', ')}</span></div>` : ''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      // 4. Active Theme
+      if (user.theme) {
+        html += `
+          <div class="section-title">🎨 Active Visual Theme</div>
+          <div class="grid-overview">
+            <div class="stat-card">
+              <div class="stat-label">GTK Theme</div>
+              <div class="stat-value">${user.theme.name || 'default'}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Cursor Theme</div>
+              <div class="stat-value">${user.theme.cursor} (${user.theme['cursor-size']}px)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Hyprcursor</div>
+              <div class="stat-value">${user.theme.hyprcursor}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Icon Theme</div>
+              <div class="stat-value">${user.theme.icons}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      // 5. Active User Applications
+      if (user.apps) {
+        const appsEntries = Object.entries(user.apps);
+        html += `
+          <div class="section-title">📱 Active User Applications (${appsEntries.length})</div>
+          <div class="cards-grid">
+            ${appsEntries.map(([appName, appConfig]) => {
+              const customProps = Object.entries(appConfig).filter(([k]) => k !== 'enable');
+              return `
+                <div class="item-card">
+                  <div class="card-title-row">
+                    <span class="card-name">${appName}</span>
+                    <span class="badge-on">Active</span>
+                  </div>
+                  <div class="prop-list">
+                    ${customProps.length ? customProps.map(([k, v]) => `
+                      <div class="prop-row">
+                        <span class="prop-k">${k}:</span>
+                        <span class="prop-v">${JSON.stringify(v)}</span>
+                      </div>
+                    `).join('') : '<span style="color: var(--text-muted); font-size: 0.8rem;">Enabled with default configuration</span>'}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+
+      // 6. Active System Services
+      if (host.services) {
+        const srvEntries = Object.entries(host.services);
+        html += `
+          <div class="section-title">⚙️ Active Host Services (${srvEntries.length})</div>
+          <div class="cards-grid">
+            ${srvEntries.map(([srvName, srvConfig]) => {
+              const customProps = Object.entries(srvConfig).filter(([k]) => k !== 'enable');
+              return `
+                <div class="item-card">
+                  <div class="card-title-row">
+                    <span class="card-name">${srvName}</span>
+                    <span class="badge-on" style="color: var(--blue); border-color: var(--blue);">System</span>
+                  </div>
+                  <div class="prop-list">
+                    ${customProps.length ? customProps.map(([k, v]) => `
+                      <div class="prop-row">
+                        <span class="prop-k">${k}:</span>
+                        <span class="prop-v">${JSON.stringify(v)}</span>
+                      </div>
+                    `).join('') : '<span style="color: var(--text-muted); font-size: 0.8rem;">Enabled</span>'}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+
+      // 7. Installed Packages List
+      const allPkgs = (user.packages || []).concat(host.systemPackages || []);
+      const uniquePkgs = Array.from(new Set(allPkgs)).sort();
+
+      html += `
+        <div class="section-title">📦 Installed Packages (${uniquePkgs.length})</div>
+        <div class="packages-container">
+          <div class="pkg-search-row">
+            <input type="text" id="pkgSearchInput" class="pkg-search" placeholder="Search installed packages (e.g. neovim, git, clang)...">
+            <span id="pkgCount" style="color: var(--text-muted); font-size: 0.85rem; align-self: center;">${uniquePkgs.length} packages</span>
+          </div>
+          <div class="pkg-tags" id="pkgTagsList">
+            ${uniquePkgs.map(pkg => `<span class="pkg-tag">${pkg}</span>`).join('')}
+          </div>
+        </div>
+      `;
+
+      content.innerHTML = html;
+
+      // Attach search listener
+      document.getElementById('pkgSearchInput').addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase().trim();
+        const tags = document.querySelectorAll('.pkg-tag');
+        let visibleCount = 0;
+
+        tags.forEach(t => {
+          const text = t.textContent.toLowerCase();
+          const match = text.includes(q);
+          t.style.display = match ? 'inline-block' : 'none';
+          if (match) {
+            visibleCount++;
+            t.classList.toggle('highlight', q.length > 0);
+          }
+        });
+
+        document.getElementById('pkgCount').textContent = `${visibleCount} of ${uniquePkgs.length} packages`;
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>

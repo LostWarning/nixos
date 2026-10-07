@@ -57,7 +57,13 @@
     };
 
     desktop-environment = lib.mkOption {
-      type = lib.types.nullOr (lib.types.enum [ "hyprland" ]);
+      type = lib.types.nullOr (
+        lib.types.enum [
+          "hyprland"
+          "gnome"
+          "kde"
+        ]
+      );
       default = null;
       description = "Default desktop environment";
     };
@@ -75,7 +81,12 @@
     };
 
     audio-backend = lib.mkOption {
-      type = lib.types.nullOr (lib.types.enum [ "pipewire" ]);
+      type = lib.types.nullOr (
+        lib.types.enum [
+          "pipewire"
+          "pulseaudio"
+        ]
+      );
       default = null;
       description = "Default audio backend";
     };

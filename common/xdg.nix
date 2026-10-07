@@ -1,5 +1,11 @@
 { config, ... }:
 
+let
+  term =
+    if (config ? metronome && config.metronome ? defaults && config.metronome.defaults.terminal != null)
+    then config.metronome.defaults.terminal
+    else "kitty";
+in
 {
   xdg.userDirs = {
     enable = true;
@@ -17,7 +23,7 @@
   xdg.desktopEntries.nvim = {
     name = "Neovim";
 
-    exec = "kitty -e nvim %F";
+    exec = "${term} -e nvim %F";
     terminal = false;
     type = "Application";
     categories = [

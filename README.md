@@ -74,7 +74,9 @@ flowchart TD
 ├── profiles/    # Reusable workflow compositions & central defaults schema
 ├── hosts/       # Machine-specific hardware configs & per-user personas
 ├── common/      # Shared universal system baselines, fonts, & locales
-└── hardware/    # Modular hardware & GPU driver profiles
+├── hardware/    # Modular hardware & GPU driver profiles
+├── docs/        # Interactive options explorer, system dashboard & evaluators
+└── Makefile     # Automated metadata extraction and local docs server
 ```
 
 ### Folder Responsibilities:
@@ -91,6 +93,8 @@ flowchart TD
   Universal settings shared across every machine: bootloader, weekly garbage collection, system fonts (JetBrainsMono, Noto Emoji), session variables, locales, unified user theming ([`common/theme.nix`](file:///etc/nixos/common/theme.nix)), and centralized networking ([`common/networking.nix`](file:///etc/nixos/common/networking.nix)).
 - **`hardware/`**:
   Modular hardware and GPU driver configurations (`metronome.hardware.gpu = "intel" | "amd"`), alongside machine-specific hardware profiles (fans, TLP, kernel modules).
+- **`docs/`**:
+  Self-contained documentation and dashboard suite. Contains the HTML interfaces (`index.html` options browser and `installed.html` system dashboard), along with Nix evaluation expressions (`options.nix`, `installed.nix`).
 
 ---
 
@@ -181,6 +185,36 @@ metronome.theme = {
   cursor = "nordzy";      # Presets: "nordzy", "adwaita"
   cursor-size = 24;
 };
+```
+
+---
+
+## 📊 Options Explorer & System Dashboard
+
+Metronome includes an automated documentation and system inspection web interface hosted in [`docs/`](docs/).
+
+### 1. Interactive Web Tools
+* **📖 Options Reference (`docs/index.html`)**:
+  - **Hierarchical Tree View**: Browse all 86+ `metronome.*` options organized by namespace (`apps`, `defaults`, `hardware`, `services`, `profiles`, `theme`).
+  - **Nix Declaration Generator**: Generates 1-click copyable Nix snippets in both direct assignment (`metronome.apps.antigravity.enable = true;`) and nested block syntax.
+  - **Metadata Inspector**: Shows types, default values, descriptions, scope badges (Host vs User vs Shared), and declaration file locations.
+* **💻 Active System Dashboard (`docs/installed.html`)**:
+  - **Multi-Host Introspection**: Seamlessly switch between configured machines (`desktop`, `thinkpad-p16-gen2`).
+  - **Evaluated Settings**: View exact active parameters (GPU drivers, display manager, audio backend, Git profiles, PipeWire crossover files, themes, and monitors).
+  - **Package Explorer**: Real-time search across all explicitly installed userland and system packages.
+
+### 2. Commands
+
+```bash
+# 1. Evaluate options schema and active host state into docs/*.json
+make
+
+# 2. Start the local documentation server
+make serve
+# Open http://localhost:8000 in your browser
+
+# 3. Clean generated metadata
+make clean
 ```
 
 ---
