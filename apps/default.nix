@@ -21,6 +21,7 @@
     ./nautilus.nix
     ./nodejs.nix
     ./pavucontrol.nix
+    ./pipewire.nix
     ./posting.nix
     ./pwvucontrol.nix
     ./quickshell.nix

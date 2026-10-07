@@ -10,11 +10,12 @@
   # D-Bus broker implementation
   services.dbus.implementation = "broker";
 
-
   # hardware.bluetooth.enable = true;
   # services.blueman.enable = true; # Optional GUI Bluetooth manager
   # services.printing.enable = true;
 
   # Power management services
   services.upower.enable = true;
+
+  boot.initrd.systemd.network.wait-online.enable = false;
 }

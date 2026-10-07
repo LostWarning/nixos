@@ -23,7 +23,6 @@
       ../../../../common/xdg.nix
       ../../../../common/theme.nix
       ../../display.nix
-      ../../pipewire.nix
       ./packages.nix
       ./theme.nix
       ./display.nix
