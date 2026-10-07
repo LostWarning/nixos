@@ -16,7 +16,7 @@
 
     ../../hardware/laptop/thinkpad/p16-gen2.nix
 
-    ./networking.nix
+    ../../common/networking.nix
 
     ../../profiles/defaults.nix
   ];
@@ -33,6 +33,8 @@
 
   metronome = {
     hardware.gpu = "intel";
+
+    networking.hostName = "thinkpad-p16-gen2";
 
     defaults = {
       display-manager = "greetd";

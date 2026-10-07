@@ -88,7 +88,7 @@ flowchart TD
 - **`hosts/`**:
   Contains distinct machine profiles (`desktop`, `thinkpad-p16-gen2`). Each host defines its hardware/networking in `configuration.nix` and manages user accounts and Home Manager profiles under `users/<username>/`.
 - **`common/`**:
-  Universal settings shared across every machine: bootloader, weekly garbage collection, system fonts (JetBrainsMono, Noto Emoji), session variables, locales, and unified user theming ([`common/theme.nix`](file:///etc/nixos/common/theme.nix)).
+  Universal settings shared across every machine: bootloader, weekly garbage collection, system fonts (JetBrainsMono, Noto Emoji), session variables, locales, unified user theming ([`common/theme.nix`](file:///etc/nixos/common/theme.nix)), and centralized networking ([`common/networking.nix`](file:///etc/nixos/common/networking.nix)).
 - **`hardware/`**:
   Modular hardware and GPU driver configurations (`metronome.hardware.gpu = "intel" | "amd"`), alongside machine-specific hardware profiles (fans, TLP, kernel modules).
 
@@ -97,11 +97,16 @@ flowchart TD
 ## 🎯 How Metronome Works in Practice
 
 ### 1. Machine Capabilities (`hosts/<host>/configuration.nix`)
-In the host configuration, you declare GPU acceleration, system-wide services, and machine defaults:
+In the host configuration, you declare GPU acceleration, system-wide services, networking, and machine defaults:
 
 ```nix
 metronome = {
   hardware.gpu = "intel";   # or "amd" — automatically configures VA-API, OpenCL, and diagnostic tools
+
+  networking = {
+    hostName = "thinkpad-p16-gen2";
+    # firewall.allowedTCPPorts = [ 80 443 ]; # defaults applied automatically
+  };
 
   defaults = {
     display-manager = "greetd";

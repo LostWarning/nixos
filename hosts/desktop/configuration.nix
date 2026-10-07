@@ -14,7 +14,8 @@
     ../../services
     ../../hardware
 
-    ./networking.nix
+    ../../common/networking.nix
+
     ./filesystem.nix
 
     ../../profiles/defaults.nix
@@ -32,6 +33,8 @@
 
   metronome = {
     hardware.gpu = "amd";
+
+    networking.hostName = "desktop";
 
     defaults = {
       display-manager = "greetd";
