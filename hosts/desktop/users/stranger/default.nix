@@ -22,7 +22,7 @@
     imports = [
       ../../../../common/xdg.nix
       ../../../../common/theme.nix
-      ../../../../hardware/display.nix
+      ../../../../common/display.nix
       ../../display.nix
       ./packages.nix
       ./theme.nix

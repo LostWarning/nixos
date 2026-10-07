@@ -12,7 +12,7 @@
     ../../common/fonts.nix
 
     ../../services
-    ../../hardware
+    ../../common/display.nix
     ../../hardware/gpu/intel.nix
 
     ../../hardware/laptop/thinkpad/p16-gen2.nix

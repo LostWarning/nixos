@@ -12,7 +12,7 @@
     ../../common/fonts.nix
 
     ../../services
-    ../../hardware
+    ../../common/display.nix
     ../../hardware/gpu/amd.nix
 
     ../../common/networking.nix
