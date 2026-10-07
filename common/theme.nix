@@ -67,24 +67,27 @@ let
     };
   };
 
-  currentTheme = themeMap.${cfg.name} or {
-    gtk = {
-      name = cfg.name;
+  currentTheme =
+    themeMap.${cfg.name} or {
+      gtk = {
+        name = cfg.name;
+        package = null;
+      };
+      color-scheme = "prefer-dark";
+    };
+
+  currentIcon =
+    iconMap.${cfg.icons} or {
+      name = cfg.icons;
       package = null;
     };
-    color-scheme = "prefer-dark";
-  };
 
-  currentIcon = iconMap.${cfg.icons} or {
-    name = cfg.icons;
-    package = null;
-  };
-
-  currentCursor = cursorMap.${cfg.cursor} or {
-    name = cfg.cursor;
-    hyprcursor = cfg.cursor;
-    package = null;
-  };
+  currentCursor =
+    cursorMap.${cfg.cursor} or {
+      name = cfg.cursor;
+      hyprcursor = cfg.cursor;
+      package = null;
+    };
 in
 {
   options.metronome.theme = {
@@ -167,10 +170,6 @@ in
         color-scheme = currentTheme.color-scheme;
         cursor-theme = currentCursor.name;
         cursor-size = cfg.cursor-size;
-      };
-      "org/gnome/nautilus/preferences" = {
-        default-folder-viewer = "icon-view";
-        sort-directories-first = true;
       };
     };
   };

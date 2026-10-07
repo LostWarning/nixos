@@ -10,7 +10,6 @@ let
   isDefault = (config.metronome.defaults.file-explorer == "nautilus");
 in
 {
-
   options.metronome.apps.nautilus = {
     enable = lib.mkOption {
       type = lib.types.bool;
@@ -21,5 +20,12 @@ in
 
   config = lib.mkIf cfg.enable {
     home.packages = [ pkgs.nautilus ];
+
+    dconf.settings = {
+      "org/gnome/nautilus/preferences" = {
+        default-folder-viewer = "icon-view";
+        sort-directories-first = true;
+      };
+    };
   };
 }
