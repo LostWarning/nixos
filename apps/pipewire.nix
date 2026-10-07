@@ -1,18 +1,21 @@
 {
   config,
+  osConfig ? null,
   lib,
   ...
 }:
 
 let
   cfg = config.metronome.apps.pipewire;
-  isDefault = (config.metronome.defaults.audio-backend == "pipewire");
+  isDefault =
+    (config.metronome.defaults.audio-backend == "pipewire")
+    || (osConfig != null && osConfig.metronome.defaults.audio-backend == "pipewire");
 in
 {
   options.metronome.apps.pipewire = {
     enable = lib.mkOption {
       type = lib.types.bool;
-      default = (cfg.configFile != null || isDefault);
+      default = isDefault;
       description = "Enable PipeWire user configuration";
     };
 
@@ -25,9 +28,6 @@ in
 
   config = lib.mkIf (cfg.enable && cfg.configFile != null) {
     xdg.configFile."pipewire/pipewire.conf.d/99-system.conf" =
-      if builtins.isPath cfg.configFile then
-        { source = cfg.configFile; }
-      else
-        { text = cfg.configFile; };
+      if builtins.isPath cfg.configFile then { source = cfg.configFile; } else { text = cfg.configFile; };
   };
 }

@@ -2,6 +2,7 @@
   lib,
   config,
   options,
+  osConfig ? null,
   ...
 }:
 
@@ -90,9 +91,10 @@
     };
   };
 
-  config = lib.optionalAttrs (options ? home) {
-    home.sessionVariables =
-      {
+  config = lib.mkMerge [
+    # Inside Home Manager, expose standard session variables
+    (lib.optionalAttrs (options ? home) {
+      home.sessionVariables = {
         EDITOR = config.metronome.defaults.text-editor;
         VISUAL = config.metronome.defaults.text-editor;
       }
@@ -102,5 +104,16 @@
       // (lib.optionalAttrs (config.metronome.defaults.web-browser != null) {
         BROWSER = config.metronome.defaults.web-browser;
       });
-  };
+    })
+
+    # Inside Home Manager, inherit system-level defaults from osConfig as defaults (can be overridden by user)
+    (lib.optionalAttrs
+      (options ? home && osConfig != null && osConfig ? metronome && osConfig.metronome ? defaults)
+      {
+        metronome.defaults = lib.mapAttrs (_name: value: lib.mkDefault value) (
+          lib.filterAttrs (_n: v: v != null) osConfig.metronome.defaults
+        );
+      }
+    )
+  ];
 }
