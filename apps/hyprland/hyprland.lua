@@ -403,25 +403,25 @@ hl.window_rule({
 })
 
 -- Force Steam Big Picture Mode to float, fullscreen, and retain focus
--- hl.window_rule({
---	name = "steam-bigpicture-fs",
---	match = {
---		title = "^Steam Big Picture Mode$",
---	},
---	float = true,
---	fullscreen = true,
---	stay_focused = true,
---})
+hl.window_rule({
+	name = "steam-bigpicture-fs",
+	match = {
+		title = "^Steam Big Picture Mode$",
+	},
+	float = true,
+	fullscreen = true,
+	stay_focused = true,
+})
 
 -- Prevent auxiliary Steam sub-windows from aggressively tiling
---hl.window_rule({
---	name = "steam-subwindows-float",
---	match = {
---		class = "^steam$",
---		title = "^(Friends List|Steam - News|Settings)$",
---	},
---	float = true,
---})
+hl.window_rule({
+	name = "steam-subwindows-float",
+	match = {
+		class = "^steam$",
+		title = "^(Friends List|Steam - News|Settings)$",
+	},
+	float = true,
+})
 
 render = {
 	direct_scanout = 2, -- 0: disabled, 1: enabled, 2: fullscreen only

@@ -43,11 +43,16 @@ in
 
     # Polkit authentication agent
     security.polkit.enable = true;
+
     systemd.user.services.hyprpolkitagent = {
       description = "Hyprland Polkit Authentication Agent";
       wantedBy = [ "graphical-session.target" ];
       wants = [ "graphical-session.target" ];
-      after = [ "graphical-session.target" ];
+      after = [
+        "graphical-session.target"
+        "xdg-desktop-portal.service"
+        "dbus.service"
+      ];
       serviceConfig = {
         Type = "simple";
         ExecStart = "${pkgs.hyprpolkitagent}/libexec/hyprpolkitagent";

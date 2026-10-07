@@ -94,5 +94,7 @@ in
 
       initLua = builtins.readFile ./init.lua;
     };
+
+    xdg.configFile."nvim/lua".source = ./lua;
   };
 }
