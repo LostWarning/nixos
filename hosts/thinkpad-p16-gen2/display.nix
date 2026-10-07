@@ -1,23 +1,17 @@
-{ lib, ... }:
+{ ... }:
 
+let
+  thinkpadP16Gen2Display = import ../../hardware/monitor/lenovo/thinkpad-p16-gen2.nix;
+  dellS2725QS = import ../../hardware/monitor/dell/s2725qs.nix;
+in
 {
-  metronome.displays = {
-    "eDP-1" = {
-      mode = lib.mkDefault "2560x1600@165";
-      position = lib.mkDefault "0x0";
-      scale = lib.mkDefault 1.0;
-      vrr = lib.mkDefault 2;
-      bitdepth = lib.mkDefault 10;
-      cm = lib.mkDefault "auto";
-      primary = lib.mkDefault true;
+  metronome.hardware.displays = {
+    "eDP-1" = thinkpadP16Gen2Display // {
+      position = "0x0";
+      primary = true;
     };
-    "DP-5" = {
-      mode = lib.mkDefault "3840x2160@120";
-      position = lib.mkDefault "2560x0";
-      scale = lib.mkDefault 1.5;
-      vrr = lib.mkDefault 2;
-      bitdepth = lib.mkDefault 10;
-      cm = lib.mkDefault "auto";
+    "DP-5" = dellS2725QS // {
+      position = "2560x0";
     };
   };
 }

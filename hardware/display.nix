@@ -1,7 +1,7 @@
 { lib, ... }:
 
 {
-  options.metronome.displays = lib.mkOption {
+  options.metronome.hardware.displays = lib.mkOption {
     type = lib.types.attrsOf (
       lib.types.submodule (
         { name, ... }:
@@ -11,6 +11,13 @@
               type = lib.types.str;
               default = name;
               description = "Connector name (e.g. eDP-1, DP-1, HDMI-A-1)";
+            };
+
+            description = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              example = "Dell S2725QS 27\" 4K 120Hz";
+              description = "Human-readable monitor description or model";
             };
 
             mode = lib.mkOption {
@@ -84,6 +91,6 @@
       )
     );
     default = { };
-    description = "User display and monitor configuration";
+    description = "Physical display and monitor configuration";
   };
 }

@@ -13,10 +13,12 @@
 
     ../../services
     ../../hardware
+    ../../hardware/gpu/amd.nix
 
     ../../common/networking.nix
 
     ./filesystem.nix
+    ./display.nix
 
     ../../profiles/defaults.nix
   ];
@@ -32,8 +34,6 @@
   ];
 
   metronome = {
-    hardware.gpu = "amd";
-
     networking.hostName = "desktop";
 
     defaults = {

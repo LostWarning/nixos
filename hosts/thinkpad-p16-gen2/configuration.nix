@@ -13,10 +13,12 @@
 
     ../../services
     ../../hardware
+    ../../hardware/gpu/intel.nix
 
     ../../hardware/laptop/thinkpad/p16-gen2.nix
 
     ../../common/networking.nix
+    ./display.nix
 
     ../../profiles/defaults.nix
   ];
@@ -32,8 +34,6 @@
   ];
 
   metronome = {
-    hardware.gpu = "intel";
-
     networking.hostName = "thinkpad-p16-gen2";
 
     defaults = {

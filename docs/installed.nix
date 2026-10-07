@@ -36,6 +36,7 @@ let
         else s
       ) host.config.metronome.services
     );
+    displays = host.config.metronome.hardware.displays or { };
     systemPackages = lib.unique (
       map (p: p.name) (lib.filter (p: p ? name) host.config.environment.systemPackages)
     );
@@ -47,7 +48,11 @@ let
         lib.mapAttrs (_n: a: cleanAppConfig a) user.metronome.apps
       );
       theme = user.metronome.theme;
-      displays = user.metronome.displays;
+      displays =
+        if user ? metronome.hardware.displays && user.metronome.hardware.displays != { } then
+          user.metronome.hardware.displays
+        else
+          (host.config.metronome.hardware.displays or { });
       packages = lib.unique (
         map (p: p.name) (
           lib.filter (p: p ? name && !lib.hasPrefix "dummy-" p.name && !lib.hasSuffix "-reference-manpage" p.name) user.home.packages

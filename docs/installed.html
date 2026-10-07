@@ -308,7 +308,8 @@
     </div>
     <nav class="nav-tabs">
       <a href="index.html" class="nav-tab">📖 Options Reference</a>
-      <a href="installed.html" class="nav-tab active">💻 Active System & Installed</a>
+      <a href="installed.html" class="nav-tab active">💻 System Dashboard</a>
+      <a href="tree.html" class="nav-tab">🫧 Bubble Graph</a>
     </nav>
   </header>
 
@@ -449,16 +450,18 @@
       }
 
       // 3. Displays Configuration
-      if (user.displays && Object.keys(user.displays).length > 0) {
+      const activeDisplays = (user.displays && Object.keys(user.displays).length > 0) ? user.displays : (host.displays || {});
+      if (activeDisplays && Object.keys(activeDisplays).length > 0) {
         html += `
           <div class="section-title">🖥️ Monitor Outputs</div>
           <div class="cards-grid">
-            ${Object.entries(user.displays).map(([outName, d]) => `
+            ${Object.entries(activeDisplays).map(([outName, d]) => `
               <div class="item-card">
                 <div class="card-title-row">
                   <span class="card-name">${outName}</span>
                   ${d.primary ? '<span class="badge-on" style="color: var(--yellow); border-color: var(--yellow);">Primary</span>' : ''}
                 </div>
+                ${d.description ? `<div style="font-size: 0.8rem; color: var(--accent); margin-bottom: 0.5rem; font-weight: 500;">${d.description}</div>` : ''}
                 <div class="prop-list">
                   <div class="prop-row"><span class="prop-k">Mode / Refresh:</span><span class="prop-v">${d.mode}</span></div>
                   <div class="prop-row"><span class="prop-k">Scale:</span><span class="prop-v">${d.scale}x</span></div>

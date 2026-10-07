@@ -20,6 +20,7 @@
     imports = [
       ../../../../common/xdg.nix
       ../../../../common/theme.nix
+      ../../../../hardware/display.nix
       ../../display.nix
       ./packages.nix
       ./theme.nix
