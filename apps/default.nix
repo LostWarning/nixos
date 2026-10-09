@@ -27,5 +27,6 @@
     ./quickshell.nix
     ./ssh.nix
     ./thunar.nix
+    ./zathura.nix
   ];
 }

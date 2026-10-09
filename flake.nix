@@ -31,8 +31,8 @@
       mkHost =
         {
           host,
+          users,
           system ? "x86_64-linux",
-          users ? [ "stranger" ],
           extraModules ? [ ],
         }:
         nixpkgs.lib.nixosSystem {

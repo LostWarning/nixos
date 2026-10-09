@@ -23,6 +23,7 @@ in
       system-monitor = lib.mkDefault "btop";
       text-editor = lib.mkDefault "nvim";
       shell = lib.mkDefault "fish";
+      pdf-viewer = lib.mkDefault "zathura";
     };
 
     # 2. Companion tools that make Hyprland a complete desktop

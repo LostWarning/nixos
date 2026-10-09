@@ -2,9 +2,12 @@
 
 let
   term =
-    if (config ? metronome && config.metronome ? defaults && config.metronome.defaults.terminal != null)
-    then config.metronome.defaults.terminal
-    else "kitty";
+    if
+      (config ? metronome && config.metronome ? defaults && config.metronome.defaults.terminal != null)
+    then
+      config.metronome.defaults.terminal
+    else
+      "kitty";
 in
 {
   xdg.userDirs = {
@@ -33,6 +36,28 @@ in
     mimeType = [
       "text/plain"
       "application/x-zerosize"
+    ];
+  };
+
+  xdg.desktopEntries.zathura = {
+    name = "Zathura";
+    genericName = "Document Viewer";
+    exec = "zathura %F";
+    terminal = false;
+    type = "Application";
+    categories = [
+      "Office"
+      "Viewer"
+    ];
+    mimeType = [
+      "application/pdf"
+      "application/x-pdf"
+      "application/postscript"
+      "application/oxps"
+      "application/vnd.ms-xpsdocument"
+      "image/vnd.djvu"
+      "application/x-cbz"
+      "application/x-cbr"
     ];
   };
 }

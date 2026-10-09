@@ -100,6 +100,14 @@
       default = "nvim";
       description = "Default text editor";
     };
+
+    pdf-viewer = lib.mkOption {
+      type = lib.types.enum [
+        "zathura"
+      ];
+      default = "zathura";
+      description = "Default pdf viewer";
+    };
   };
 
   config = lib.mkMerge [
