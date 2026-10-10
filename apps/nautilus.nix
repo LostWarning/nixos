@@ -8,7 +8,9 @@
 let
   cfg = config.metronome.apps.nautilus;
   isDefault = (config.metronome.defaults.file-explorer == "nautilus");
+  term = config.metronome.defaults.terminal;
 in
+
 {
   options.metronome.apps.nautilus = {
     enable = lib.mkOption {
@@ -26,6 +28,22 @@ in
         default-folder-viewer = "icon-view";
         sort-directories-first = true;
       };
+    };
+
+    xdg.desktopEntries.nvim = lib.mkIf isDefault {
+      name = "Neovim";
+
+      exec = "${term} -e nvim %F";
+      terminal = false;
+      type = "Application";
+      categories = [
+        "Utility"
+        "TextEditor"
+      ];
+      mimeType = [
+        "text/plain"
+        "application/x-zerosize"
+      ];
     };
   };
 }

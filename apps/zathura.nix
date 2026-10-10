@@ -21,5 +21,15 @@ in
     programs.zathura = {
       enable = true;
     };
+
+    xdg.mimeApps = lib.mkIf isDefault {
+      enable = true;
+      defaultApplications = {
+        "application/pdf" = "org.pwmt.zathura.desktop";
+        "application/epub+zip" = "org.pwmt.zathura.desktop";
+        "application/oxps" = "org.pwmt.zathura.desktop";
+        "application/vnd.ms-xpsdocument" = "org.pwmt.zathura.desktop";
+      };
+    };
   };
 }

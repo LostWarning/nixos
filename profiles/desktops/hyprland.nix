@@ -24,6 +24,7 @@ in
       text-editor = lib.mkDefault "nvim";
       shell = lib.mkDefault "fish";
       pdf-viewer = lib.mkDefault "zathura";
+      image-viewer = lib.mkDefault "imv";
     };
 
     # 2. Companion tools that make Hyprland a complete desktop

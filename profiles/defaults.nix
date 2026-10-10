@@ -108,6 +108,16 @@
       default = "zathura";
       description = "Default pdf viewer";
     };
+
+    image-viewer = lib.mkOption {
+      type = lib.types.enum [
+        "imv"
+        "swayimg"
+        "loupe"
+      ];
+      default = "imv";
+      description = "Default image viewer";
+    };
   };
 
   config = lib.mkMerge [

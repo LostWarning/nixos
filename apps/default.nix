@@ -16,6 +16,7 @@
     ./fish.nix
     ./git.nix
     ./google-chrome.nix
+    ./imv.nix
     ./mpd.nix
     ./mpv.nix
     ./nautilus.nix
