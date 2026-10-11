@@ -8,8 +8,8 @@
 let
   cfg = config.metronome.apps.nvim;
   isDefault = (config.metronome.defaults.text-editor == "nvim");
+  term = config.metronome.defaults.terminal;
 in
-
 {
   options.metronome.apps.nvim = {
     enable = lib.mkOption {
@@ -96,5 +96,29 @@ in
     };
 
     xdg.configFile."nvim/lua".source = ./lua;
+
+    xdg.desktopEntries.nvim = {
+      name = "Neovim";
+
+      exec = "${term} -e nvim %F";
+      terminal = false;
+      type = "Application";
+      categories = [
+        "Utility"
+        "TextEditor"
+      ];
+      mimeType = [
+        "text/plain"
+        "application/x-zerosize"
+      ];
+    };
+
+    xdg.mimeApps = lib.mkIf isDefault {
+      enable = true;
+      defaultApplications = {
+        "text/plain" = "nvim.desktop";
+        "application/x-zerosize" = "nvim.desktop";
+      };
+    };
   };
 }
