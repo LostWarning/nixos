@@ -68,6 +68,16 @@ in
 
         # Terminal
         toggleterm-nvim
+
+        # Rendering
+        render-markdown-nvim
+        markdown-preview-nvim
+
+        # Debugging (DAP)
+        nvim-dap
+        nvim-dap-ui
+        nvim-nio
+        nvim-dap-virtual-text
       ];
 
       extraPackages = with pkgs; [
@@ -76,6 +86,10 @@ in
         nil
         clang-tools # clangd & clang-format
         rust-analyzer
+
+        # Debuggers
+        lldb # provides lldb-dap
+        gdb
 
         # Formatters & Linters
         stylua

@@ -3,137 +3,317 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Metronome Options Explorer</title>
+  <title>Metronome :: Linux Terminal Interface</title>
   <style>
     :root {
-      --bg: #1e1e2e;
-      --sidebar-bg: #181825;
-      --card-bg: #1e1e2e;
-      --header-bg: #11111b;
-      --text: #cdd6f4;
-      --text-muted: #a6adc8;
-      --border: #313244;
-      --accent: #cba6f7;
-      --accent-glow: rgba(203, 166, 247, 0.15);
-      --blue: #89b4fa;
-      --green: #a6e3a1;
-      --yellow: #f9e2af;
-      --peach: #fab387;
-      --surface0: #313244;
-      --surface1: #45475a;
-      --code-bg: #11111b;
+      --term-bg: #11121d;
+      --term-card: #181926;
+      --term-card-subtle: #1e1e2e;
+      --term-header: #0d0e17;
+      --term-status: #141522;
+      --term-border: #2d3149;
+      --term-border-glow: #43496e;
+
+      /* Terminal Colors (Tokyo Night & Catppuccin Mocha mix) */
+      --fg: #c0caf5;
+      --fg-dim: #7982a9;
+      --fg-muted: #565f89;
+      --term-green: #73daca;
+      --term-cyan: #7dcfff;
+      --term-blue: #89b4fa;
+      --term-magenta: #bb9af7;
+      --term-purple: #cba6f7;
+      --term-yellow: #e0af68;
+      --term-orange: #ff9e64;
+      --term-red: #f7768e;
+
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', Menlo, Monaco, Consolas, 'Courier New', monospace;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: var(--font-mono);
+      background: #090a10;
+      color: var(--fg);
       display: flex;
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
+      font-size: 13.5px;
+      line-height: 1.45;
     }
 
-    /* Top Bar */
-    header {
-      background: var(--header-bg);
-      border-bottom: 1px solid var(--border);
-      padding: 0.75rem 1.5rem;
+    /* Terminal Window Frame */
+    .terminal-window {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 56px;
-      flex-shrink: 0;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-weight: 700;
-      font-size: 1.15rem;
-      color: var(--accent);
-    }
-    .brand span { color: var(--text); font-weight: 400; font-size: 0.95rem; }
-
-    .header-stats {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    /* Main Container */
-    .app-body {
-      display: flex;
-      flex: 1;
-      height: calc(100vh - 56px);
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      background: var(--term-bg);
+      border: 1px solid var(--term-border);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
       overflow: hidden;
     }
 
-    /* Sidebar (Tree View) */
-    aside {
-      width: 360px;
-      min-width: 280px;
-      max-width: 500px;
-      background: var(--sidebar-bg);
-      border-right: 1px solid var(--border);
+    /* Window Titlebar */
+    .titlebar {
+      background: var(--term-header);
+      border-bottom: 1px solid var(--term-border);
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 42px;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .window-controls {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .win-btn {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .win-btn:hover { opacity: 0.8; }
+    .win-btn.close { background: var(--term-red); box-shadow: 0 0 6px rgba(247, 118, 142, 0.4); }
+    .win-btn.min { background: var(--term-yellow); box-shadow: 0 0 6px rgba(224, 175, 104, 0.4); }
+    .win-btn.max { background: var(--term-green); box-shadow: 0 0 6px rgba(115, 218, 202, 0.4); }
+
+    .titlebar-center {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--fg-dim);
+    }
+    .titlebar-center .prompt-user { color: var(--term-green); font-weight: 600; }
+    .titlebar-center .prompt-path { color: var(--term-cyan); font-weight: 600; }
+    .titlebar-center .prompt-shell { color: var(--term-magenta); }
+
+    .titlebar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.78rem;
+      color: var(--fg-muted);
+    }
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--term-green);
+      font-weight: 600;
+    }
+    .badge-status::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      background: var(--term-green);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--term-green);
+      display: inline-block;
+    }
+
+    /* Terminal Tabs Bar */
+    .tab-bar {
+      background: #0f1019;
+      border-bottom: 1px solid var(--term-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 0.5rem;
+      height: 38px;
+      flex-shrink: 0;
+    }
+
+    .tabs-group {
+      display: flex;
+      gap: 2px;
+      height: 100%;
+      align-items: flex-end;
+    }
+
+    .term-tab {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.45rem 1rem;
+      background: transparent;
+      color: var(--fg-dim);
+      border: 1px solid transparent;
+      border-bottom: none;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 500;
+      transition: all 0.15s;
+      text-decoration: none;
+      height: 32px;
+    }
+    .term-tab:hover {
+      color: var(--fg);
+      background: rgba(45, 49, 73, 0.4);
+    }
+    .term-tab.active {
+      color: var(--term-cyan);
+      background: var(--term-bg);
+      border-color: var(--term-border);
+      border-bottom: 1px solid var(--term-bg);
+      font-weight: 600;
+    }
+    .term-tab .tab-num {
+      color: var(--fg-muted);
+      font-size: 0.75rem;
+    }
+    .term-tab.active .tab-num {
+      color: var(--term-magenta);
+    }
+
+    .tabbar-info {
+      font-size: 0.78rem;
+      color: var(--fg-muted);
+      padding-right: 0.75rem;
+    }
+    .tabbar-info span { color: var(--term-yellow); font-weight: 600; }
+
+    /* Main Viewport */
+    .term-viewport {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 42px - 38px - 28px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .tab-panel {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+    .tab-panel.active {
+      display: flex;
+    }
+
+    /* ========================================================
+       TAB 1: OPTIONS REFERENCE VIEW
+       ======================================================== */
+    .options-layout {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* Left Sidebar: Options Tree */
+    .tree-pane {
+      width: 380px;
+      min-width: 300px;
+      max-width: 520px;
+      background: #0d0e17;
+      border-right: 1px solid var(--term-border);
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
     }
 
-    .tree-search-box {
-      padding: 0.75rem;
-      border-bottom: 1px solid var(--border);
-      background: var(--sidebar-bg);
+    .term-prompt-box {
+      padding: 0.65rem 0.85rem;
+      border-bottom: 1px solid var(--term-border);
+      background: #11121d;
     }
 
-    .search-input {
+    .prompt-label-line {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      margin-bottom: 0.35rem;
+    }
+    .prompt-label-line .usr { color: var(--term-green); font-weight: 600; }
+    .prompt-label-line .at { color: var(--fg-muted); }
+    .prompt-label-line .host { color: var(--term-cyan); font-weight: 600; }
+    .prompt-label-line .path { color: var(--term-yellow); }
+    .prompt-label-line .cmd { color: var(--term-magenta); }
+
+    .term-input-wrap {
+      display: flex;
+      align-items: center;
+      background: #090a10;
+      border: 1px solid var(--term-border);
+      border-radius: 4px;
+      padding: 0.35rem 0.55rem;
+    }
+    .term-input-wrap:focus-within {
+      border-color: var(--term-cyan);
+      box-shadow: 0 0 8px rgba(125, 207, 255, 0.2);
+    }
+    .term-input-wrap .prompt-glyph {
+      color: var(--term-green);
+      font-weight: 700;
+      margin-right: 0.4rem;
+    }
+    .term-search-input {
+      background: transparent;
+      border: none;
+      color: var(--fg);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
       width: 100%;
-      background: var(--surface0);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      padding: 0.5rem 0.75rem;
-      font-size: 0.9rem;
       outline: none;
     }
-    .search-input:focus { border-color: var(--accent); }
 
-    .tree-scope-filters {
+    /* Scope Filters Toolbar */
+    .scope-bar {
       display: flex;
+      padding: 0.45rem 0.85rem;
+      background: #141522;
+      border-bottom: 1px solid var(--term-border);
       gap: 0.35rem;
-      padding: 0.5rem 0.75rem;
-      border-bottom: 1px solid var(--border);
-      background: var(--sidebar-bg);
     }
 
-    .scope-btn {
+    .term-btn-scope {
       flex: 1;
-      background: var(--surface0);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      border-radius: 4px;
-      font-size: 0.75rem;
-      padding: 0.3rem 0.2rem;
-      cursor: pointer;
+      background: #1c1d2e;
+      border: 1px solid var(--term-border);
+      color: var(--fg-dim);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
       font-weight: 600;
-      transition: all 0.15s;
+      padding: 0.3rem 0.2rem;
+      border-radius: 4px;
+      cursor: pointer;
       text-align: center;
+      transition: all 0.15s;
     }
-    .scope-btn.active {
-      background: var(--accent);
-      color: #11111b;
-      border-color: var(--accent);
+    .term-btn-scope:hover {
+      color: var(--fg);
+      border-color: var(--term-border-glow);
+    }
+    .term-btn-scope.active {
+      background: var(--term-cyan);
+      color: #0d0e17;
+      border-color: var(--term-cyan);
+      font-weight: 700;
     }
 
-    .tree-container {
+    /* Tree View Container */
+    .tree-scroll-container {
       flex: 1;
       overflow-y: auto;
-      padding: 0.5rem 0.25rem 2rem 0.5rem;
+      padding: 0.5rem 0.35rem 2rem 0.5rem;
     }
 
-    /* Tree Node Elements */
     .tree-node {
       user-select: none;
     }
@@ -142,348 +322,930 @@
       display: flex;
       align-items: center;
       gap: 0.35rem;
-      padding: 0.35rem 0.5rem;
-      border-radius: 6px;
+      padding: 0.3rem 0.45rem;
+      border-radius: 4px;
       cursor: pointer;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.85rem;
-      color: var(--text);
-      transition: background 0.15s, color 0.15s;
+      font-size: 0.82rem;
+      color: var(--fg-dim);
+      transition: background 0.12s, color 0.12s;
+      white-space: nowrap;
     }
     .node-row:hover {
-      background: var(--surface0);
+      background: #1e2030;
+      color: var(--fg);
     }
     .node-row.active {
-      background: var(--surface1);
-      color: var(--accent);
+      background: #25283d;
+      color: var(--term-cyan);
       font-weight: 600;
+      border-left: 2px solid var(--term-cyan);
     }
 
-    .toggle-icon {
+    .tree-glyph {
+      color: var(--fg-muted);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
       width: 14px;
-      height: 14px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      transition: transform 0.15s;
-      flex-shrink: 0;
+      transition: transform 0.12s;
     }
-    .toggle-icon.expanded { transform: rotate(90deg); }
-    .toggle-icon.placeholder { visibility: hidden; }
+    .tree-glyph.expanded { transform: rotate(90deg); }
+    .tree-glyph.placeholder { visibility: hidden; }
 
-    .node-icon {
-      font-size: 0.85rem;
-      flex-shrink: 0;
+    .node-sym {
+      font-size: 0.8rem;
     }
+    .node-sym.dir { color: var(--term-yellow); }
+    .node-sym.leaf-bool { color: var(--term-green); }
+    .node-sym.leaf-other { color: var(--term-purple); }
 
-    .node-label {
+    .node-text {
       flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
-    .node-badge {
-      font-size: 0.65rem;
+    .pill-scope {
+      font-size: 0.62rem;
       text-transform: uppercase;
       font-weight: 700;
-      padding: 0.1rem 0.35rem;
-      border-radius: 4px;
-      letter-spacing: 0.5px;
+      padding: 0.08rem 0.35rem;
+      border-radius: 3px;
+      letter-spacing: 0.3px;
       margin-left: auto;
     }
-    .node-badge.system { color: var(--blue); background: rgba(137, 180, 250, 0.12); }
-    .node-badge.user { color: var(--green); background: rgba(166, 227, 161, 0.12); }
-    .node-badge.shared { color: var(--yellow); background: rgba(249, 226, 175, 0.12); }
+    .pill-scope.system { color: var(--term-blue); background: rgba(137, 180, 250, 0.12); border: 1px solid rgba(137, 180, 250, 0.25); }
+    .pill-scope.user { color: var(--term-green); background: rgba(115, 218, 202, 0.12); border: 1px solid rgba(115, 218, 202, 0.25); }
+    .pill-scope.shared { color: var(--term-yellow); background: rgba(224, 175, 104, 0.12); border: 1px solid rgba(224, 175, 104, 0.25); }
 
     .tree-children {
-      margin-left: 1rem;
-      border-left: 1px solid rgba(49, 50, 68, 0.6);
-      padding-left: 0.25rem;
+      margin-left: 1.1rem;
+      border-left: 1px dotted rgba(67, 73, 110, 0.6);
+      padding-left: 0.2rem;
       display: none;
     }
     .tree-children.expanded { display: block; }
 
-    /* Right Main Area (Details) */
-    main {
+    /* Right Main Details View (Bat/Less Styled) */
+    .detail-pane {
       flex: 1;
       overflow-y: auto;
-      padding: 2rem 2.5rem;
-      background: var(--bg);
+      padding: 1.5rem 2rem 3rem 2rem;
+      background: var(--term-bg);
     }
 
-    .breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-family: monospace;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 0.75rem;
-    }
-    .breadcrumb span { color: var(--accent); }
-
-    .detail-header {
-      margin-bottom: 1.5rem;
-    }
-
-    .title-row {
+    .detail-top-banner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1rem;
-      margin-bottom: 0.75rem;
+      border-bottom: 1px solid var(--term-border);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.8rem;
+      color: var(--fg-muted);
+    }
+    .detail-top-banner .file-name {
+      color: var(--term-cyan);
+      font-weight: 600;
+    }
+    .detail-top-banner .file-meta {
+      color: var(--fg-dim);
     }
 
-    .detail-title {
-      font-family: monospace;
-      font-size: 1.7rem;
-      color: var(--text);
+    .term-box-title {
+      font-size: 1.4rem;
+      color: var(--fg);
+      font-weight: 700;
       word-break: break-all;
-    }
-
-    .scope-banner {
+      margin-bottom: 0.75rem;
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-      margin-bottom: 1.5rem;
-      font-size: 0.9rem;
-    }
-    .scope-banner.user {
-      background: rgba(166, 227, 161, 0.1);
-      border: 1px solid rgba(166, 227, 161, 0.3);
-      color: var(--green);
-    }
-    .scope-banner.system {
-      background: rgba(137, 180, 250, 0.1);
-      border: 1px solid rgba(137, 180, 250, 0.3);
-      color: var(--blue);
-    }
-    .scope-banner.shared {
-      background: rgba(249, 226, 175, 0.1);
-      border: 1px solid rgba(249, 226, 175, 0.3);
-      color: var(--yellow);
+      flex-wrap: wrap;
     }
 
-    .section-title {
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      font-weight: 700;
-      color: var(--text-muted);
-      margin-bottom: 0.5rem;
-      margin-top: 1.75rem;
-    }
-
-    .desc-box {
-      font-size: 1.05rem;
-      color: var(--text);
-      line-height: 1.6;
-      background: var(--card-bg);
-      padding: 1rem;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
-
-    /* Code Snippet Box */
-    .code-container {
-      position: relative;
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      margin-bottom: 1rem;
-    }
-
-    .code-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #181825;
-      padding: 0.4rem 0.85rem;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      font-family: monospace;
-    }
-
-    .copy-button {
-      background: var(--surface0);
-      border: 1px solid var(--border);
-      color: var(--text);
+    .term-scope-box {
+      border: 1px solid;
       border-radius: 4px;
-      padding: 0.25rem 0.6rem;
+      padding: 0.65rem 0.9rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .term-scope-box.user {
+      border-color: rgba(115, 218, 202, 0.35);
+      background: rgba(115, 218, 202, 0.05);
+      color: var(--term-green);
+    }
+    .term-scope-box.system {
+      border-color: rgba(137, 180, 250, 0.35);
+      background: rgba(137, 180, 250, 0.05);
+      color: var(--term-blue);
+    }
+    .term-scope-box.shared {
+      border-color: rgba(224, 175, 104, 0.35);
+      background: rgba(224, 175, 104, 0.05);
+      color: var(--term-yellow);
+    }
+
+    .term-section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--term-magenta);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .term-section-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--term-border);
+    }
+
+    .term-desc-block {
+      background: #141522;
+      border: 1px solid var(--term-border);
+      border-left: 3px solid var(--term-purple);
+      border-radius: 4px;
+      padding: 0.85rem 1.1rem;
+      color: var(--fg);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    /* Terminal Code Block (Bat Style) */
+    .bat-code-block {
+      background: #0a0b12;
+      border: 1px solid var(--term-border);
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+    }
+
+    .bat-header {
+      background: #141522;
+      border-bottom: 1px solid var(--term-border);
+      padding: 0.4rem 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--fg-dim);
+    }
+
+    .btn-term-copy {
+      background: #1f2133;
+      border: 1px solid var(--term-border);
+      color: var(--fg);
+      font-family: var(--font-mono);
       font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 0.3rem;
       transition: all 0.15s;
     }
-    .copy-button:hover {
-      background: var(--accent);
-      color: #11111b;
-      border-color: var(--accent);
+    .btn-term-copy:hover {
+      background: var(--term-cyan);
+      color: #0d0e17;
+      border-color: var(--term-cyan);
     }
 
-    pre code {
-      display: block;
-      padding: 1rem 1.25rem;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.95rem;
-      line-height: 1.5;
-      color: #cdd6f4;
+    pre.bat-code {
+      padding: 0.75rem 1rem;
       overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--fg);
+    }
+    pre.bat-code code {
+      font-family: inherit;
     }
 
-    /* Meta Table */
-    .meta-table {
+    /* ASCII Table */
+    .term-table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 0.5rem;
-      background: var(--card-bg);
-      border-radius: 8px;
-      border: 1px solid var(--border);
+      background: #141522;
+      border: 1px solid var(--term-border);
+      border-radius: 4px;
       overflow: hidden;
+      font-size: 0.84rem;
     }
-    .meta-table td {
-      padding: 0.75rem 1rem;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.9rem;
+    .term-table td {
+      padding: 0.65rem 0.95rem;
+      border-bottom: 1px solid var(--term-border);
     }
-    .meta-table tr:last-child td { border-bottom: none; }
-    .meta-table td.label {
+    .term-table tr:last-child td { border-bottom: none; }
+    .term-table td.col-prop {
       width: 160px;
+      color: var(--fg-muted);
       font-weight: 600;
-      color: var(--text-muted);
     }
-    .meta-table td.value {
-      font-family: monospace;
-      color: var(--peach);
+    .term-table td.col-val {
+      color: var(--term-yellow);
     }
 
-    .folder-summary {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.25rem;
+    .namespace-children-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+    .namespace-child-card {
+      background: #141522;
+      border: 1px solid var(--term-border);
+      border-radius: 4px;
+      padding: 0.55rem 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.12s;
+    }
+    .namespace-child-card:hover {
+      background: #1e2030;
+      border-color: var(--term-cyan);
+      color: var(--term-cyan);
     }
 
-    .sub-options-list {
+    /* ========================================================
+       TAB 2: SYSTEM DASHBOARD (system.status)
+       ======================================================== */
+    .status-layout {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      padding: 0.75rem 1.25rem 2rem 1.25rem;
+      background: var(--term-bg);
+    }
+
+    /* Neofetch ASCII Box */
+    .neofetch-card {
+      background: #0e0f18;
+      border: 1px solid var(--term-border);
+      border-radius: 5px;
+      padding: 0.85rem 1.15rem;
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    .ascii-logo {
+      color: var(--term-cyan);
+      font-size: 0.82rem;
+      line-height: 1.2;
+      white-space: pre;
+      user-select: none;
+    }
+
+    .neofetch-specs {
+      flex: 1;
+      min-width: 280px;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
-      margin-top: 1rem;
+      gap: 0.3rem;
+      font-size: 0.85rem;
     }
-    .sub-option-item {
+    .neofetch-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--term-green);
+    }
+    .neofetch-sep {
+      color: var(--fg-muted);
+      margin-bottom: 0.3rem;
+    }
+    .spec-line {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .spec-k {
+      color: var(--term-yellow);
+      font-weight: 600;
+      width: 140px;
+    }
+    .spec-v {
+      color: var(--fg);
+    }
+
+    .dash-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .dash-stat-tile {
+      background: #141522;
+      border: 1px solid var(--term-border);
+      border-radius: 5px;
+      padding: 0.75rem 1rem;
+    }
+    .stat-k {
+      font-size: 0.72rem;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.25rem;
+    }
+    .stat-v {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--term-yellow);
+      word-break: break-all;
+    }
+
+    .cards-2col {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .terminal-card {
+      background: #141522;
+      border: 1px solid var(--term-border);
+      border-radius: 5px;
+      padding: 0.85rem 1.1rem;
+    }
+    .term-card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.6rem 0.85rem;
-      background: var(--surface0);
-      border-radius: 6px;
-      cursor: pointer;
-      font-family: monospace;
-      font-size: 0.9rem;
-      transition: background 0.15s;
+      border-bottom: 1px solid var(--term-border);
+      padding-bottom: 0.4rem;
+      margin-bottom: 0.6rem;
     }
-    .sub-option-item:hover { background: var(--surface1); color: var(--accent); }
+    .term-card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--term-cyan);
+    }
+    .badge-active-dot {
+      color: var(--term-green);
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .badge-active-dot::before {
+      content: '●';
+      font-size: 0.75rem;
+    }
 
+    .prop-row {
+      display: flex;
+      font-size: 0.8rem;
+      margin-bottom: 0.25rem;
+    }
+    .prop-row .pk {
+      width: 120px;
+      color: var(--fg-muted);
+    }
+    .prop-row .pv {
+      color: var(--fg);
+      word-break: break-all;
+    }
+
+    /* Packages Explorer */
+    .pkg-explorer-box {
+      background: #141522;
+      border: 1px solid var(--term-border);
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      margin-top: 0.5rem;
+    }
+    .pkg-search-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .pkg-input {
+      flex: 1;
+      background: #090a10;
+      border: 1px solid var(--term-border);
+      border-radius: 4px;
+      padding: 0.45rem 0.75rem;
+      color: var(--fg);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .pkg-input:focus { border-color: var(--term-cyan); }
+    .pkg-tags-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+    .pkg-tag {
+      background: #1c1d2e;
+      border: 1px solid var(--term-border);
+      color: var(--fg-dim);
+      font-size: 0.76rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+    }
+    .pkg-tag.highlight {
+      background: var(--term-cyan);
+      color: #0d0e17;
+      font-weight: 700;
+    }
+
+    /* ========================================================
+       BOTTOM POPUP TERMINAL DRAWER
+       ======================================================== */
+    .bottom-term-drawer {
+      display: none;
+      height: 270px;
+      background: #090a10;
+      border-top: 2px solid var(--term-cyan);
+      box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.7);
+      flex-direction: column;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 50;
+    }
+    .bottom-term-drawer.open {
+      display: flex;
+    }
+    .bottom-term-header {
+      background: #11121d;
+      border-bottom: 1px solid var(--term-border);
+      padding: 0.35rem 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 32px;
+      user-select: none;
+      flex-shrink: 0;
+    }
+    .drawer-title-left {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.78rem;
+    }
+    .drawer-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .btn-drawer-action {
+      background: #1c1d2e;
+      border: 1px solid var(--term-border);
+      color: var(--fg-dim);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .btn-drawer-action:hover {
+      background: var(--term-cyan);
+      color: #0d0e17;
+      border-color: var(--term-cyan);
+    }
+    .bottom-term-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .btn-term-drawer-toggle, .btn-top-term-toggle {
+      background: #1c1d2e;
+      border: 1px solid var(--term-border);
+      color: var(--term-cyan);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.15rem 0.55rem;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: all 0.12s;
+    }
+    .btn-term-drawer-toggle:hover, .btn-top-term-toggle:hover {
+      background: var(--term-cyan);
+      color: #0d0e17;
+      border-color: var(--term-cyan);
+    }
+    .btn-term-drawer-toggle.active, .btn-top-term-toggle.active {
+      background: var(--term-green);
+      color: #0d0e17;
+      border-color: var(--term-green);
+    }
+
+    .shell-history {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .shell-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      word-break: break-all;
+    }
+    .shell-output {
+      font-size: 0.83rem;
+      line-height: 1.5;
+      color: var(--fg-dim);
+      white-space: pre-wrap;
+      padding-left: 0.5rem;
+      border-left: 2px solid #23263d;
+      margin: 0.2rem 0 0.6rem 0;
+    }
+
+    .shell-input-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .shell-prompt {
+      color: var(--term-green);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .shell-prompt .pth { color: var(--term-cyan); }
+    .shell-cli-input {
+      background: transparent;
+      border: none;
+      color: var(--fg);
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      flex: 1;
+      outline: none;
+      caret-color: var(--term-green);
+    }
+
+    /* Bottom Statusline (Tmux / Airline style) */
+    .statusline {
+      height: 28px;
+      background: var(--term-status);
+      border-top: 1px solid var(--term-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 0.75rem;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .statusline-left {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .mode-pill {
+      background: var(--term-cyan);
+      color: #0d0e17;
+      font-weight: 700;
+      padding: 0.1rem 0.45rem;
+      border-radius: 3px;
+      font-size: 0.7rem;
+    }
+    .status-item {
+      color: var(--fg-dim);
+    }
+    .status-item span { color: var(--term-yellow); }
+
+    .statusline-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: var(--fg-muted);
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0e0f18;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2b2e46;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #43486c;
+    }
+
+    /* Empty/Error state */
     .empty-state {
       text-align: center;
-      padding: 4rem 2rem;
-      color: var(--text-muted);
+      padding: 3rem 1.5rem;
+      color: var(--fg-muted);
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="brand">
-      ⚙️ Metronome <span>Options Explorer</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 1rem;">
-      <nav style="display: flex; gap: 0.5rem;">
-        <a href="index.html" style="background: var(--accent); color: #11111b; border: 1px solid var(--accent); padding: 0.35rem 0.85rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-decoration: none;">📖 Options Reference</a>
-        <a href="installed.html" style="background: var(--surface0); color: var(--text-muted); border: 1px solid var(--border); padding: 0.35rem 0.85rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-decoration: none;">💻 System Dashboard</a>
-        <a href="tree.html" style="background: var(--surface0); color: var(--text-muted); border: 1px solid var(--border); padding: 0.35rem 0.85rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-decoration: none;">🫧 Bubble Graph</a>
-      </nav>
-      <div class="header-stats" id="headerStats">
-        Loading options...
+  <div class="terminal-window">
+    <!-- Window Titlebar -->
+    <div class="titlebar">
+      <div class="window-controls">
+        <span class="win-btn close" title="Close"></span>
+        <span class="win-btn min" title="Minimize"></span>
+        <span class="win-btn max" title="Maximize"></span>
+      </div>
+      <div class="titlebar-center">
+        <span class="prompt-user">stranger@metronome</span>
+        <span class="prompt-path">:~/nixos-config</span>
+        <span class="prompt-shell">(fish)</span>
+      </div>
+      <div class="titlebar-right">
+        <span class="badge-status">SYS_ACTIVE</span>
+        <span>❄️ NixOS 24.11</span>
       </div>
     </div>
-  </header>
 
-  <div class="app-body">
-    <!-- Sidebar: Hierarchical Tree -->
-    <aside>
-      <div class="tree-search-box">
-        <input type="text" id="treeSearch" class="search-input" placeholder="Filter options (e.g. mpd, gpu)...">
+    <!-- Terminal Tab Bar -->
+    <div class="tab-bar">
+      <div class="tabs-group" id="tabsGroup">
+        <button class="term-tab active" data-tab="options">
+          <span class="tab-num">[1]</span>
+          <span>⚡ metronome.options</span>
+        </button>
+        <button class="term-tab term-tab-host" data-tab="host" data-host="desktop">
+          <span class="tab-num">[2]</span>
+          <span>🖥️ host:desktop</span>
+        </button>
+        <button class="term-tab term-tab-host" data-tab="host" data-host="thinkpad-p16-gen2">
+          <span class="tab-num">[3]</span>
+          <span>💻 host:thinkpad-p16-gen2</span>
+        </button>
       </div>
-      <div class="tree-scope-filters">
-        <button class="scope-btn active" data-scope="all">All</button>
-        <button class="scope-btn" data-scope="system">Host</button>
-        <button class="scope-btn" data-scope="user">User</button>
-        <button class="scope-btn" data-scope="shared">Shared</button>
+      <div class="tabbar-info" style="display: flex; align-items: center; gap: 0.85rem;">
+        <span id="statsBar">Loading schema...</span>
+        <button id="btnTopToggleTerm" class="btn-top-term-toggle" title="Toggle Terminal Drawer (Ctrl+`)">❯_ Terminal</button>
       </div>
-      <div class="tree-container" id="treeRoot">
-        <div class="empty-state">Loading tree...</div>
-      </div>
-    </aside>
+    </div>
 
-    <!-- Main Content Area: Selected Option Details -->
-    <main id="detailView">
-      <div class="empty-state">
-        <h2>Select an option from the left tree</h2>
-        <p style="margin-top: 0.5rem;">Explore categories, check types, defaults, and copy declarative Nix snippets.</p>
+    <!-- Main Viewport -->
+    <div class="term-viewport">
+
+      <!-- ==============================================
+           PANEL 1: OPTIONS REFERENCE
+           ============================================== -->
+      <div class="tab-panel active options-layout" id="panelOptions">
+        <!-- Sidebar: Tree View -->
+        <aside class="tree-pane">
+          <div class="term-prompt-box">
+            <div class="prompt-label-line">
+              <span class="usr">stranger</span><span class="at">@</span><span class="host">metronome</span>
+              <span class="path">:~</span>
+              <span class="cmd">$ nix-option --filter</span>
+            </div>
+            <div class="term-input-wrap">
+              <span class="prompt-glyph">❯</span>
+              <input type="text" id="treeFilterInput" class="term-search-input" placeholder="Search options (e.g. gpu, mpd, git)..." autocomplete="off" spellcheck="false">
+            </div>
+          </div>
+
+          <div class="scope-bar">
+            <button class="term-btn-scope active" data-scope="all">ALL</button>
+            <button class="term-btn-scope" data-scope="system">HOST</button>
+            <button class="term-btn-scope" data-scope="user">USER</button>
+            <button class="term-btn-scope" data-scope="shared">SHARED</button>
+          </div>
+
+          <div class="tree-scroll-container" id="treeRoot">
+            <div class="empty-state">Loading option tree...</div>
+          </div>
+        </aside>
+
+        <!-- Main Details Pane -->
+        <main class="detail-pane" id="detailView">
+          <div class="empty-state">
+            <h3>Select a Metronome option from the tree</h3>
+            <p style="margin-top: 0.5rem; font-size: 0.85rem;">Browse declarative schemas, copy ready-to-use Nix code, and inspect module declarations.</p>
+          </div>
+        </main>
       </div>
-    </main>
+
+      <!-- ==============================================
+           PANEL 2: SYSTEM STATUS & DASHBOARD
+           ============================================== -->
+      <div class="tab-panel status-layout" id="panelStatus">
+        <div id="statusContent">
+          <div class="empty-state">Loading active system state...</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Collapsible Bottom Terminal Drawer (hidden by default) -->
+    <div class="bottom-term-drawer" id="bottomTermDrawer">
+      <div class="bottom-term-header">
+        <div class="drawer-title-left">
+          <span style="color: var(--term-green); font-weight: 600;">stranger@metronome</span>
+          <span style="color: var(--term-cyan);">:~</span>
+          <span style="color: var(--term-magenta);">(fish)</span>
+          <span class="badge-status" style="margin-left: 0.5rem; font-size: 0.72rem;">CLI_READY</span>
+        </div>
+        <div class="drawer-actions">
+          <button class="btn-drawer-action" onclick="executeCommand('clear')">Clear</button>
+          <button class="btn-drawer-action" id="btnCloseDrawer">✕ Close (Esc)</button>
+        </div>
+      </div>
+      <div class="bottom-term-body" id="bottomTermBody">
+        <div class="shell-history" id="shellHistory">
+          <div class="shell-output" style="color: var(--term-cyan); border-left-color: var(--term-cyan);">
+═══════════════════════════════════════════════════════════════════════
+  ⏱️  METRONOME LINUX TERMINAL INTERFACE  [v24.11-flake]
+═══════════════════════════════════════════════════════════════════════
+  Type '<span style="color: var(--term-yellow)">help</span>' to list available terminal commands.
+  Type '<span style="color: var(--term-yellow)">neofetch</span>' to print the host system overview.
+  Type '<span style="color: var(--term-yellow)">options</span>' to inspect evaluated Metronome Nix options.
+  Type '<span style="color: var(--term-yellow)">cat &lt;option&gt;</span>' to print Nix snippet for any option.
+          </div>
+        </div>
+
+        <div class="shell-input-row">
+          <span class="shell-prompt">stranger@metronome:<span class="pth">~</span>$</span>
+          <input type="text" id="cliInput" class="shell-cli-input" placeholder="type command (e.g. help, neofetch, options)..." autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+    </div>
+
+    <!-- Statusline -->
+    <div class="statusline">
+      <div class="statusline-left">
+        <span class="mode-pill" id="statusMode">NORMAL</span>
+        <span class="status-item">📁 <span id="statusFile">metronome.nix</span></span>
+        <span class="status-item">| Scope: <span id="statusScope">all</span></span>
+        <span class="status-item">| Host: <span id="statusHost">desktop</span></span>
+      </div>
+      <div class="statusline-right">
+        <button id="btnToggleTerm" class="btn-term-drawer-toggle" title="Toggle Terminal Drawer (Ctrl+`)">⌨️ Terminal</button>
+        <span>utf-8</span>
+        <span>nix</span>
+        <span id="statusTotalCount">91 options</span>
+        <span>stranger@nixos</span>
+      </div>
+    </div>
   </div>
 
   <script>
+    // Global State
     let optionsData = [];
+    let installedData = null;
     let treeRootNode = null;
     let activeScope = 'all';
     let searchQuery = '';
     let selectedPath = null;
+    let selectedHostKey = 'desktop';
+
+    // Shell History
+    let commandHistory = [];
+    let historyIndex = -1;
 
     async function init() {
+      // Setup tabs
+      setupTabs();
+      setupShell();
+
+      // Load data
       try {
-        let res = await fetch('options.json').catch(() => null);
-        if (!res || !res.ok) {
-          res = await fetch('docs/options.json');
+        const [optRes, instRes] = await Promise.all([
+          fetch('options.json').catch(() => fetch('docs/options.json')),
+          fetch('installed.json').catch(() => fetch('docs/installed.json'))
+        ]);
+
+        if (optRes && optRes.ok) {
+          const oJson = await optRes.json();
+          optionsData = oJson.options || [];
+          document.getElementById('statsBar').innerHTML =
+            `<span>${oJson.meta.total}</span> options · <span>${oJson.meta.categories.length}</span> categories`;
+          document.getElementById('statusTotalCount').textContent = `${oJson.meta.total} options`;
+
+          buildTree();
+          setupTreeControls();
+          renderTree();
+
+          // Auto-select gpu or first option
+          const defaultOpt = optionsData.find(o => o.name === 'metronome.hardware.gpu') || optionsData[0];
+          if (defaultOpt) {
+            selectNode(defaultOpt.name, defaultOpt);
+          }
         }
-        if (!res || !res.ok) throw new Error('options.json not found');
-        const data = await res.json();
-        optionsData = data.options;
 
-        document.getElementById('headerStats').textContent =
-          `${data.meta.total} options · ${data.meta.categories.length} categories`;
-
-        buildTree();
-        setupSearchAndFilters();
-        renderTree();
-
-        // Select first default option if available
-        const defaultOpt = optionsData.find(o => o.name === 'metronome.hardware.gpu') || optionsData[0];
-        if (defaultOpt) {
-          selectNode(defaultOpt.name, defaultOpt);
+        if (instRes && instRes.ok) {
+          installedData = await instRes.json();
+          setupHostTabs(Object.keys(installedData.hosts));
+          renderHostDashboard();
         }
       } catch (err) {
-        document.getElementById('treeRoot').innerHTML = `
-          <div class="empty-state">
-            <p>⚠️ Failed to load <code>options.json</code></p>
-            <p style="font-size: 0.8rem; margin-top: 0.5rem;">Run <code>make</code> to generate it.</p>
-          </div>
-        `;
+        console.error("Initialization error:", err);
       }
     }
 
-    // Build hierarchical tree structure from flat options list
+    // ==========================================
+    // TABS MANAGEMENT
+    // ==========================================
+    function setupTabs() {
+      const tabsGroup = document.getElementById('tabsGroup');
+      if (tabsGroup) {
+        tabsGroup.addEventListener('click', (e) => {
+          const tab = e.target.closest('.term-tab');
+          if (!tab) return;
+          const target = tab.dataset.tab;
+          const hostKey = tab.dataset.host;
+          switchTab(target, hostKey);
+        });
+      }
+
+      // Handle URL hash or pathname on load
+      const hash = window.location.hash.toLowerCase();
+      if (window.location.pathname.endsWith('installed.html') || hash === '#status' || hash === '#installed' || hash === '#desktop') {
+        switchTab('host', 'desktop');
+      } else if (hash === '#thinkpad' || hash === '#thinkpad-p16-gen2') {
+        switchTab('host', 'thinkpad-p16-gen2');
+      } else if (hash === '#shell' || hash === '#terminal') {
+        toggleBottomTerminal(true);
+      }
+    }
+
+    function switchTab(tabKey, hostKey) {
+      if (tabKey === 'host') {
+        if (hostKey) selectedHostKey = hostKey;
+        document.querySelectorAll('.term-tab').forEach(t => {
+          t.classList.toggle('active', t.dataset.tab === 'host' && t.dataset.host === selectedHostKey);
+        });
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('panelStatus').classList.add('active');
+        document.getElementById('statusMode').textContent = 'SYSTEM';
+        document.getElementById('statusFile').textContent = `${selectedHostKey}/configuration.nix`;
+        document.getElementById('statusHost').textContent = selectedHostKey;
+        renderHostDashboard();
+      } else if (tabKey === 'options') {
+        document.querySelectorAll('.term-tab').forEach(t => {
+          t.classList.toggle('active', t.dataset.tab === 'options');
+        });
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('panelOptions').classList.add('active');
+        document.getElementById('statusMode').textContent = 'OPTIONS';
+        document.getElementById('statusFile').textContent = selectedPath ? `${selectedPath}.nix` : 'metronome.nix';
+      }
+    }
+
+    function setupHostTabs(hosts) {
+      const container = document.getElementById('tabsGroup');
+      if (!container) return;
+
+      // Clear existing host tabs
+      container.querySelectorAll('.term-tab-host').forEach(el => el.remove());
+
+      hosts.forEach((hKey, idx) => {
+        const btn = document.createElement('button');
+        const tabNumber = idx + 2;
+        const icon = (hKey.includes('laptop') || hKey.includes('thinkpad')) ? '💻' : '🖥️';
+        const isCurrentlyActive = document.getElementById('panelStatus').classList.contains('active') && selectedHostKey === hKey;
+        btn.className = `term-tab term-tab-host ${isCurrentlyActive ? 'active' : ''}`;
+        btn.dataset.tab = 'host';
+        btn.dataset.host = hKey;
+        btn.innerHTML = `
+          <span class="tab-num">[${tabNumber}]</span>
+          <span>${icon} host:${hKey}</span>
+        `;
+        container.appendChild(btn);
+      });
+    }
+
+    // ==========================================
+    // TREE DATA & RENDERING
+    // ==========================================
     function buildTree() {
       treeRootNode = { name: 'metronome', fullPath: 'metronome', children: {}, isLeaf: false, option: null };
 
@@ -512,23 +1274,24 @@
       });
     }
 
-    function setupSearchAndFilters() {
-      document.getElementById('treeSearch').addEventListener('input', (e) => {
+    function setupTreeControls() {
+      const searchInput = document.getElementById('treeFilterInput');
+      searchInput.addEventListener('input', (e) => {
         searchQuery = e.target.value.toLowerCase().trim();
         renderTree();
       });
 
-      document.querySelectorAll('.scope-btn').forEach(btn => {
+      document.querySelectorAll('.term-btn-scope').forEach(btn => {
         btn.addEventListener('click', () => {
-          document.querySelectorAll('.scope-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.term-btn-scope').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           activeScope = btn.dataset.scope;
+          document.getElementById('statusScope').textContent = activeScope;
           renderTree();
         });
       });
     }
 
-    // Check if node or any of its descendants matches search & scope
     function nodeMatches(node) {
       if (node.isLeaf && node.option) {
         if (activeScope !== 'all' && node.option.scope !== activeScope) return false;
@@ -539,8 +1302,6 @@
         }
         return true;
       }
-
-      // Intermediate node
       return Object.values(node.children).some(child => nodeMatches(child));
     }
 
@@ -549,12 +1310,23 @@
       container.innerHTML = '';
 
       const topLevelKeys = Object.keys(treeRootNode.children).sort();
+      let hasResults = false;
+
       topLevelKeys.forEach(key => {
         const child = treeRootNode.children[key];
         if (nodeMatches(child)) {
+          hasResults = true;
           container.appendChild(createTreeNodeDOM(child));
         }
       });
+
+      if (!hasResults) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>No matching options found for query: "<code>${escapeHtml(searchQuery)}</code>"</p>
+          </div>
+        `;
+      }
     }
 
     function createTreeNodeDOM(node) {
@@ -565,31 +1337,39 @@
       const row = document.createElement('div');
       row.className = `node-row ${selectedPath === node.fullPath ? 'active' : ''}`;
 
-      // Toggle Arrow
+      // Glyph (arrow)
       const toggle = document.createElement('span');
-      toggle.className = `toggle-icon ${hasChildren ? '' : 'placeholder'}`;
+      toggle.className = `tree-glyph ${hasChildren ? '' : 'placeholder'}`;
       toggle.textContent = '▶';
 
-      // Icon
-      const icon = document.createElement('span');
-      icon.className = 'node-icon';
-      icon.textContent = hasChildren ? '📁' : (node.option && node.option.type === 'boolean' ? '🔘' : '⚙️');
+      // Symbol
+      const sym = document.createElement('span');
+      if (hasChildren) {
+        sym.className = 'node-sym dir';
+        sym.textContent = '📁';
+      } else if (node.option && node.option.type === 'boolean') {
+        sym.className = 'node-sym leaf-bool';
+        sym.textContent = '🔘';
+      } else {
+        sym.className = 'node-sym leaf-other';
+        sym.textContent = '⚙️';
+      }
 
-      // Label
+      // Text label
       const label = document.createElement('span');
-      label.className = 'node-label';
+      label.className = 'node-text';
       label.textContent = node.name;
 
       row.appendChild(toggle);
-      row.appendChild(icon);
+      row.appendChild(sym);
       row.appendChild(label);
 
-      // Scope Badge
+      // Scope badge
       if (node.option) {
-        const badge = document.createElement('span');
-        badge.className = `node-badge ${node.option.scope}`;
-        badge.textContent = node.option.scope;
-        row.appendChild(badge);
+        const pill = document.createElement('span');
+        pill.className = `pill-scope ${node.option.scope}`;
+        pill.textContent = node.option.scope;
+        row.appendChild(pill);
       }
 
       wrapper.appendChild(row);
@@ -598,7 +1378,6 @@
         const childrenContainer = document.createElement('div');
         childrenContainer.className = 'tree-children';
 
-        // Auto-expand if searching or top level
         const shouldExpand = searchQuery.length > 0 || node.fullPath.split('.').length <= 2;
         if (shouldExpand) {
           childrenContainer.classList.add('expanded');
@@ -625,7 +1404,6 @@
       row.addEventListener('click', () => {
         document.querySelectorAll('.node-row').forEach(r => r.classList.remove('active'));
         row.classList.add('active');
-        selectedPath = node.fullPath;
         selectNode(node.fullPath, node.option, node);
       });
 
@@ -634,7 +1412,7 @@
 
     function selectNode(fullPath, option, node) {
       selectedPath = fullPath;
-      const main = document.getElementById('detailView');
+      document.getElementById('statusFile').textContent = `${fullPath}.nix`;
 
       if (option) {
         renderLeafDetail(option);
@@ -646,13 +1424,22 @@
     function renderLeafDetail(opt) {
       const main = document.getElementById('detailView');
       const parts = opt.name.split('.');
-      const scopeText = {
-        system: "Host / NixOS Service (Declare in <code>hosts/&lt;host&gt;/configuration.nix</code>)",
-        user: "Userland / Home Manager (Declare in <code>hosts/&lt;host&gt;/users/&lt;user&gt;/packages.nix</code>)",
-        shared: "Shared System Slot (Declare in <code>configuration.nix</code> or override in <code>packages.nix</code>)"
-      }[opt.scope];
 
-      // Formulate practical example value
+      const scopeInfo = {
+        system: {
+          tag: "HOST / SYSTEM SERVICE",
+          hint: "Declare in hosts/&lt;host&gt;/configuration.nix or services/&lt;service&gt;.nix"
+        },
+        user: {
+          tag: "USERLAND / HOME MANAGER",
+          hint: "Declare in hosts/&lt;host&gt;/users/&lt;user&gt;/packages.nix or apps/&lt;app&gt;.nix"
+        },
+        shared: {
+          tag: "SHARED SYSTEM SLOT",
+          hint: "Declare in configuration.nix or override in packages.nix via metronome.defaults.*"
+        }
+      }[opt.scope] || { tag: "UNKNOWN", hint: "" };
+
       let exampleVal = "true";
       if (opt.type === "boolean") {
         exampleVal = opt.default === "true" ? "false" : "true";
@@ -668,69 +1455,66 @@
       }
 
       const flatSnippet = `${opt.name} = ${exampleVal};`;
-
-      // Formulate nested Nix snippet
       const nestedSnippet = generateNestedSnippet(opt.name, exampleVal);
 
       main.innerHTML = `
-        <div class="breadcrumb">
-          ${parts.map((p, i) => i === parts.length - 1 ? `<span>${p}</span>` : `${p} / `).join('')}
+        <div class="detail-top-banner">
+          <div><span class="file-name">${opt.name}.nix</span> · [Mode: RO]</div>
+          <div class="file-meta">Decl: ${opt.declarations ? opt.declarations.join(', ') : 'flake.nix'}</div>
         </div>
 
-        <div class="detail-header">
-          <div class="title-row">
-            <h1 class="detail-title">${opt.name}</h1>
-            <span class="node-badge ${opt.scope}" style="font-size: 0.85rem; padding: 0.3rem 0.7rem;">${opt.scope}</span>
+        <div class="term-box-title">
+          <span>${opt.name}</span>
+          <span class="pill-scope ${opt.scope}" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">${opt.scope}</span>
+        </div>
+
+        <div class="term-scope-box ${opt.scope}">
+          <span style="font-weight: 700;">[${scopeInfo.tag}]</span>
+          <span>${scopeInfo.hint}</span>
+        </div>
+
+        <div class="term-section-header">Description</div>
+        <div class="term-desc-block">
+          ${opt.description || '<em>No description documented in module options.</em>'}
+        </div>
+
+        <div class="term-section-header">Nix Snippet (Direct Assignment)</div>
+        <div class="bat-code-block">
+          <div class="bat-header">
+            <span>bat --language=nix (direct)</span>
+            <button class="btn-term-copy" onclick="copySnippet('${escapeQuotes(flatSnippet)}')">📋 Copy</button>
           </div>
+          <pre class="bat-code"><code>1 │ ${escapeHtml(flatSnippet)}</code></pre>
+        </div>
 
-          <div class="scope-banner ${opt.scope}">
-            <span>📍</span>
-            <div>${scopeText}</div>
+        <div class="term-section-header">Nix Snippet (Nested Configuration Block)</div>
+        <div class="bat-code-block">
+          <div class="bat-header">
+            <span>bat --language=nix (nested block)</span>
+            <button class="btn-term-copy" onclick="copySnippet('${escapeQuotes(nestedSnippet)}')">📋 Copy</button>
           </div>
+          <pre class="bat-code"><code>${formatWithLineNumbers(nestedSnippet)}</code></pre>
         </div>
 
-        <div class="section-title">Description</div>
-        <div class="desc-box">
-          ${opt.description || '<em>No description provided in module.</em>'}
-        </div>
-
-        <div class="section-title">How To Declare (Nix)</div>
-
-        <div class="code-container">
-          <div class="code-header">
-            <span>Direct Assignment</span>
-            <button class="copy-button" onclick="copySnippet('${escapeQuotes(flatSnippet)}')">📋 Copy</button>
-          </div>
-          <pre><code>${escapeHtml(flatSnippet)}</code></pre>
-        </div>
-
-        <div class="code-container">
-          <div class="code-header">
-            <span>Nested Block Assignment</span>
-            <button class="copy-button" onclick="copySnippet('${escapeQuotes(nestedSnippet)}')">📋 Copy</button>
-          </div>
-          <pre><code>${escapeHtml(nestedSnippet)}</code></pre>
-        </div>
-
-        <div class="section-title">Option Properties</div>
-        <table class="meta-table">
+        <div class="term-section-header">Module Properties</div>
+        <table class="term-table">
           <tr>
-            <td class="label">Type</td>
-            <td class="value">${escapeHtml(opt.type || 'unspecified')}</td>
+            <td class="col-prop">Type</td>
+            <td class="col-val">${escapeHtml(opt.type || 'unspecified')}</td>
           </tr>
           <tr>
-            <td class="label">Default</td>
-            <td class="value">${escapeHtml(opt.default !== null ? opt.default : 'null')}</td>
+            <td class="col-prop">Default</td>
+            <td class="col-val">${escapeHtml(opt.default !== null ? opt.default : 'null')}</td>
           </tr>
           ${opt.example ? `
           <tr>
-            <td class="label">Upstream Example</td>
-            <td class="value">${escapeHtml(opt.example)}</td>
+            <td class="col-prop">Upstream Example</td>
+            <td class="col-val">${escapeHtml(opt.example)}</td>
           </tr>` : ''}
           ${opt.declarations && opt.declarations.length ? `
           <tr>
-            <td class="label">Declared in</td>
-            <td class="value" style="color: var(--accent);">${opt.declarations.join(', ')}</td>
+            <td class="col-prop">Declaration File</td>
+            <td class="col-val" style="color: var(--term-cyan);">${opt.declarations.join(', ')}</td>
           </tr>` : ''}
         </table>
       `;
@@ -740,7 +1524,6 @@
       const main = document.getElementById('detailView');
       const allSubOptions = collectLeaves(node);
 
-      // Generate full nested block for all options in this group
       let blockLines = [];
       allSubOptions.forEach(sub => {
         let val = (sub.type === 'boolean') ? 'true' : (sub.default || '"..."');
@@ -751,35 +1534,35 @@
       const folderSnippet = `${node.fullPath} = {\n${blockLines.join('\n')}\n};`;
 
       main.innerHTML = `
-        <div class="breadcrumb">
-          ${node.fullPath.split('.').join(' / ')}
+        <div class="detail-top-banner">
+          <div><span class="file-name">${node.fullPath}/*</span> · [Namespace Directory]</div>
+          <div class="file-meta">Count: ${allSubOptions.length} sub-options</div>
         </div>
 
-        <div class="detail-header">
-          <div class="title-row">
-            <h1 class="detail-title">${node.fullPath}.*</h1>
-            <span class="node-badge" style="background: var(--surface0); color: var(--text);">Namespace</span>
+        <div class="term-box-title">
+          <span>${node.fullPath}.*</span>
+          <span class="pill-scope shared">Namespace</span>
+        </div>
+
+        <div class="term-desc-block">
+          This namespace aggregates <strong>${allSubOptions.length}</strong> configuration attributes under <code>${node.fullPath}</code>.
+        </div>
+
+        <div class="term-section-header">Batch Module Block</div>
+        <div class="bat-code-block">
+          <div class="bat-header">
+            <span>bat --language=nix (batch namespace block)</span>
+            <button class="btn-term-copy" onclick="copySnippet('${escapeQuotes(folderSnippet)}')">📋 Copy Block</button>
           </div>
-          <p style="color: var(--text-muted); margin-top: 0.5rem;">
-            Contains ${allSubOptions.length} available options under this configuration module.
-          </p>
+          <pre class="bat-code"><code>${formatWithLineNumbers(folderSnippet)}</code></pre>
         </div>
 
-        <div class="section-title">Batch Declaration Template</div>
-        <div class="code-container">
-          <div class="code-header">
-            <span>Nix Module Block</span>
-            <button class="copy-button" onclick="copySnippet('${escapeQuotes(folderSnippet)}')">📋 Copy Block</button>
-          </div>
-          <pre><code>${escapeHtml(folderSnippet)}</code></pre>
-        </div>
-
-        <div class="section-title">Options in this namespace</div>
-        <div class="sub-options-list">
+        <div class="term-section-header">Options Under This Namespace</div>
+        <div class="namespace-children-grid">
           ${allSubOptions.map(sub => `
-            <div class="sub-option-item" onclick="selectFromList('${sub.name}')">
+            <div class="namespace-child-card" onclick="selectFromList('${sub.name}')">
               <span>${sub.name}</span>
-              <span class="node-badge ${sub.scope}">${sub.scope}</span>
+              <span class="pill-scope ${sub.scope}">${sub.scope}</span>
             </div>
           `).join('')}
         </div>
@@ -822,16 +1605,410 @@
       return code.trim();
     }
 
+    function formatWithLineNumbers(text) {
+      const lines = text.split('\n');
+      return lines.map((line, idx) => {
+        const num = (idx + 1).toString().padStart(2, ' ');
+        return `<span style="color: var(--fg-muted);">${num} │</span> ${escapeHtml(line)}`;
+      }).join('\n');
+    }
+
     function copySnippet(text) {
       navigator.clipboard.writeText(text);
-      const btn = event.target.closest('.copy-button');
+      const btn = event.target.closest('.btn-term-copy');
       if (btn) {
-        const oldText = btn.innerHTML;
-        btn.innerHTML = '✅ Copied!';
-        setTimeout(() => { btn.innerHTML = oldText; }, 1500);
+        const orig = btn.innerHTML;
+        btn.innerHTML = '✓ Copied!';
+        setTimeout(() => { btn.innerHTML = orig; }, 1500);
       }
     }
 
+    function renderHostDashboard() {
+      if (!installedData || !installedData.hosts) return;
+      const host = installedData.hosts[selectedHostKey];
+      if (!host) return;
+
+      const user = host.users && host.users.stranger ? host.users.stranger : (Object.values(host.users || {})[0] || {});
+      const defaults = host.defaults || {};
+
+      document.getElementById('statusHost').textContent = host.hostName;
+
+      const content = document.getElementById('statusContent');
+
+      // 1. Neofetch ASCII Info Box
+      const activeDisplays = (user.displays && Object.keys(user.displays).length > 0) ? user.displays : (host.displays || {});
+      const displayDesc = Object.values(activeDisplays).map(d => `${d.mode} (${d.output})`).join(', ') || 'Default';
+
+      let html = `
+        <div class="neofetch-card">
+          <div class="ascii-logo">
+      /\\          metronome@${host.hostName}
+     /  \\         -----------------------
+    / /\\ \\        OS: NixOS 24.11 (Linux x86_64)
+   / /  \\ \\       Host: ${host.hostName}
+  / /    \\ \\      GPU: ${(host.gpu || 'none').toUpperCase()} Acceleration
+ /_/      \\_\\     DE/WM: ${defaults['desktop-environment'] || 'Hyprland'}
+                  Display: ${defaults['display-manager'] || 'greetd'}
+                  Audio: ${defaults['audio-backend'] || 'pipewire'}
+                  Terminal: ${user.defaults?.terminal || defaults['terminal'] || 'kitty'}
+                  Editor: ${user.defaults?.['text-editor'] || defaults['text-editor'] || 'nvim'}
+                  Shell: ${defaults['shell'] || 'fish'}
+          </div>
+
+          <div class="neofetch-specs">
+            <div class="neofetch-title">stranger@${host.hostName}</div>
+            <div class="neofetch-sep">───────────────────────────────────────</div>
+            <div class="spec-line"><span class="spec-k">NixOS Version:</span><span class="spec-v">24.11 (Modular Flake)</span></div>
+            <div class="spec-line"><span class="spec-k">GPU Acceleration:</span><span class="spec-v" style="color: var(--term-green); font-weight: 700;">${(host.gpu || 'none').toUpperCase()}</span></div>
+            <div class="spec-line"><span class="spec-k">Audio Server:</span><span class="spec-v" style="color: var(--term-cyan); font-weight: 700;">${defaults['audio-backend'] || 'pipewire'}</span></div>
+            <div class="spec-line"><span class="spec-k">Display Outputs:</span><span class="spec-v">${displayDesc}</span></div>
+            <div class="spec-line"><span class="spec-k">Web Server:</span><span class="spec-v">${defaults['web-server'] || 'nginx'}</span></div>
+            <div class="spec-line"><span class="spec-k">Web Browser:</span><span class="spec-v">${user.defaults?.['web-browser'] || 'google-chrome'}</span></div>
+          </div>
+        </div>
+      `;
+
+      // 2. Overview Stats Tiles
+      html += `
+        <div class="term-section-header">Core Host Attributes</div>
+        <div class="dash-grid-4">
+          <div class="dash-stat-tile">
+            <div class="stat-k">Hostname</div>
+            <div class="stat-v" style="color: var(--term-cyan);">${host.hostName}</div>
+          </div>
+          <div class="dash-stat-tile">
+            <div class="stat-k">Primary User</div>
+            <div class="stat-v" style="color: var(--term-green);">${user.userName || 'stranger'}</div>
+          </div>
+          <div class="dash-stat-tile">
+            <div class="stat-k">Desktop Session</div>
+            <div class="stat-v">${defaults['desktop-environment'] || 'Hyprland'}</div>
+          </div>
+          <div class="dash-stat-tile">
+            <div class="stat-k">Shell & Prompt</div>
+            <div class="stat-v">${defaults['shell'] || 'fish'} / ${defaults['shell-prompt'] || 'starship'}</div>
+          </div>
+        </div>
+      `;
+
+      // 3. Displays Configuration
+      if (activeDisplays && Object.keys(activeDisplays).length > 0) {
+        html += `
+          <div class="term-section-header">Monitors & Display Outputs</div>
+          <div class="cards-2col">
+            ${Object.entries(activeDisplays).map(([outName, d]) => `
+              <div class="terminal-card">
+                <div class="term-card-header">
+                  <span class="term-card-title">${outName}</span>
+                  ${d.primary ? '<span class="pill-scope shared">PRIMARY</span>' : ''}
+                </div>
+                ${d.description ? `<div style="font-size: 0.8rem; color: var(--term-magenta); margin-bottom: 0.5rem;">${d.description}</div>` : ''}
+                <div class="prop-row"><span class="pk">Mode / Refresh:</span><span class="pv">${d.mode}</span></div>
+                <div class="prop-row"><span class="pk">Scale Factor:</span><span class="pv">${d.scale}x</span></div>
+                <div class="prop-row"><span class="pk">Position:</span><span class="pv">${d.position}</span></div>
+                ${d.vrr ? `<div class="prop-row"><span class="pk">VRR Mode:</span><span class="pv">Mode ${d.vrr}</span></div>` : ''}
+                ${d.workspaces ? `<div class="prop-row"><span class="pk">Workspaces:</span><span class="pv">${d.workspaces.join(', ')}</span></div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      // 4. Active Applications
+      if (user.apps) {
+        const appsEntries = Object.entries(user.apps);
+        html += `
+          <div class="term-section-header">Active Userland Applications (${appsEntries.length})</div>
+          <div class="cards-2col">
+            ${appsEntries.map(([appName, appConfig]) => {
+              const customProps = Object.entries(appConfig).filter(([k]) => k !== 'enable');
+              return `
+                <div class="terminal-card">
+                  <div class="term-card-header">
+                    <span class="term-card-title">${appName}</span>
+                    <span class="badge-active-dot">ACTIVE</span>
+                  </div>
+                  ${customProps.length ? customProps.map(([k, v]) => `
+                    <div class="prop-row"><span class="pk">${k}:</span><span class="pv">${JSON.stringify(v)}</span></div>
+                  `).join('') : '<div style="font-size: 0.78rem; color: var(--fg-muted);">Enabled via metronome.apps</div>'}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+
+      // 5. Active System Services
+      if (host.services) {
+        const srvEntries = Object.entries(host.services);
+        html += `
+          <div class="term-section-header">Active Host Services (${srvEntries.length})</div>
+          <div class="cards-2col">
+            ${srvEntries.map(([srvName, srvConfig]) => {
+              const customProps = Object.entries(srvConfig).filter(([k]) => k !== 'enable');
+              return `
+                <div class="terminal-card">
+                  <div class="term-card-header">
+                    <span class="term-card-title">${srvName}</span>
+                    <span class="badge-active-dot" style="color: var(--term-blue);">SYSTEM</span>
+                  </div>
+                  ${customProps.length ? customProps.map(([k, v]) => `
+                    <div class="prop-row"><span class="pk">${k}:</span><span class="pv">${JSON.stringify(v)}</span></div>
+                  `).join('') : '<div style="font-size: 0.78rem; color: var(--fg-muted);">Systemd unit active</div>'}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+
+      // 6. Packages Explorer
+      const allPkgs = (user.packages || []).concat(host.systemPackages || []);
+      const uniquePkgs = Array.from(new Set(allPkgs)).sort();
+
+      html += `
+        <div class="term-section-header">Installed Packages (${uniquePkgs.length})</div>
+        <div class="pkg-explorer-box">
+          <div class="pkg-search-bar">
+            <span style="color: var(--term-green); font-weight: 700;">❯ grep:</span>
+            <input type="text" id="pkgSearchInput" class="pkg-input" placeholder="filter packages (e.g. nvim, git, chrome)..." autocomplete="off">
+            <span id="pkgCounterBadge" style="color: var(--fg-muted); font-size: 0.8rem; white-space: nowrap;">${uniquePkgs.length} packages</span>
+          </div>
+          <div class="pkg-tags-wrapper" id="pkgTagsList">
+            ${uniquePkgs.map(p => `<span class="pkg-tag">${p}</span>`).join('')}
+          </div>
+        </div>
+      `;
+
+      content.innerHTML = html;
+
+      // Filter listener
+      const pkgInput = document.getElementById('pkgSearchInput');
+      if (pkgInput) {
+        pkgInput.addEventListener('input', (e) => {
+          const q = e.target.value.toLowerCase().trim();
+          const tags = document.querySelectorAll('.pkg-tag');
+          let count = 0;
+          tags.forEach(t => {
+            const match = t.textContent.toLowerCase().includes(q);
+            t.style.display = match ? 'inline-block' : 'none';
+            if (match) {
+              count++;
+              t.classList.toggle('highlight', q.length > 0);
+            }
+          });
+          document.getElementById('pkgCounterBadge').textContent = `${count} of ${uniquePkgs.length} packages`;
+        });
+      }
+    }
+
+    // ==========================================
+    // INTERACTIVE TERMINAL SHELL
+    // ==========================================
+    function setupShell() {
+      const cli = document.getElementById('cliInput');
+      cli.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const cmd = cli.value.trim();
+          if (cmd) {
+            commandHistory.push(cmd);
+            historyIndex = commandHistory.length;
+            executeCommand(cmd);
+          }
+          cli.value = '';
+        } else if (e.key === 'ArrowUp') {
+          if (historyIndex > 0) {
+            historyIndex--;
+            cli.value = commandHistory[historyIndex];
+          }
+        } else if (e.key === 'ArrowDown') {
+          if (historyIndex < commandHistory.length - 1) {
+            historyIndex++;
+            cli.value = commandHistory[historyIndex];
+          } else {
+            historyIndex = commandHistory.length;
+            cli.value = '';
+          }
+        }
+      });
+
+      // Toggle buttons
+      document.getElementById('btnToggleTerm')?.addEventListener('click', () => toggleBottomTerminal());
+      document.getElementById('btnTopToggleTerm')?.addEventListener('click', () => toggleBottomTerminal());
+      document.getElementById('btnCloseDrawer')?.addEventListener('click', () => toggleBottomTerminal(false));
+
+      // Global keyboard shortcut: Ctrl+` or Ctrl+~, Esc to close
+      window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && (e.key === '`' || e.key === '~')) {
+          e.preventDefault();
+          toggleBottomTerminal();
+        } else if (e.key === 'Escape') {
+          const drawer = document.getElementById('bottomTermDrawer');
+          if (drawer && drawer.classList.contains('open')) {
+            toggleBottomTerminal(false);
+          }
+        }
+      });
+    }
+
+    function toggleBottomTerminal(open) {
+      const drawer = document.getElementById('bottomTermDrawer');
+      if (!drawer) return;
+      const isCurrentlyOpen = drawer.classList.contains('open');
+      const shouldOpen = (open !== undefined) ? open : !isCurrentlyOpen;
+
+      drawer.classList.toggle('open', shouldOpen);
+
+      document.querySelectorAll('.btn-term-drawer-toggle, .btn-top-term-toggle').forEach(btn => {
+        btn.classList.toggle('active', shouldOpen);
+      });
+
+      if (shouldOpen) {
+        document.getElementById('cliInput').focus();
+        const body = document.getElementById('bottomTermBody');
+        if (body) body.scrollTop = body.scrollHeight;
+      }
+    }
+
+    function executeCommand(cmdLine) {
+      const history = document.getElementById('shellHistory');
+
+      // Append prompt line
+      const promptLine = document.createElement('div');
+      promptLine.className = 'shell-line';
+      promptLine.innerHTML = `<span class="shell-prompt">stranger@metronome:<span class="pth">~</span>$</span> <span>${escapeHtml(cmdLine)}</span>`;
+      history.appendChild(promptLine);
+
+      const parts = cmdLine.split(' ');
+      const cmd = parts[0].toLowerCase();
+      const arg = parts.slice(1).join(' ').trim();
+
+      const outputEl = document.createElement('div');
+      outputEl.className = 'shell-output';
+
+      switch (cmd) {
+        case 'help':
+          outputEl.innerHTML = `
+Available Metronome Terminal Commands:
+  <span style="color: var(--term-yellow)">help</span>                  - Display this help message
+  <span style="color: var(--term-yellow)">neofetch</span> / <span style="color: var(--term-yellow)">fastfetch</span>  - Print NixOS system & host specifications
+  <span style="color: var(--term-yellow)">options [filter]</span>      - List evaluated Metronome options
+  <span style="color: var(--term-yellow)">cat &lt;option&gt;</span>          - Show Nix declaration and details for an option
+  <span style="color: var(--term-yellow)">hosts</span>                 - List configured NixOS machines
+  <span style="color: var(--term-yellow)">packages [filter]</span>     - List/search explicitly installed packages
+  <span style="color: var(--term-yellow)">theme</span>                 - Inspect active user theme properties
+  <span style="color: var(--term-yellow)">clear</span>                 - Clear terminal screen
+`;
+          break;
+
+        case 'clear':
+          history.innerHTML = '';
+          return;
+
+        case 'neofetch':
+        case 'fastfetch':
+          const h = (installedData && installedData.hosts[selectedHostKey]) || {};
+          const d = h.defaults || {};
+          outputEl.innerHTML = `
+      /\\          <span style="color: var(--term-green); font-weight: bold;">stranger@${h.hostName || 'metronome'}</span>
+     /  \\         -----------------------
+    / /\\ \\        <span style="color: var(--term-yellow);">OS:</span> NixOS 24.11 (Linux x86_64)
+   / /  \\ \\       <span style="color: var(--term-yellow);">Host:</span> ${h.hostName || 'ThinkPad / Desktop'}
+  / /    \\ \\      <span style="color: var(--term-yellow);">GPU:</span> ${(h.gpu || 'intel/amd').toUpperCase()}
+ /_/      \\_\\     <span style="color: var(--term-yellow);">DE/WM:</span> ${d['desktop-environment'] || 'Hyprland (Wayland)'}
+                  <span style="color: var(--term-yellow);">Terminal:</span> ${d['terminal'] || 'kitty'}
+                  <span style="color: var(--term-yellow);">Editor:</span> ${d['text-editor'] || 'nvim'}
+                  <span style="color: var(--term-yellow);">Audio:</span> ${d['audio-backend'] || 'pipewire'}
+                  <span style="color: var(--term-yellow);">Shell:</span> ${d['shell'] || 'fish'}
+`;
+          break;
+
+        case 'hosts':
+          if (!installedData || !installedData.hosts) {
+            outputEl.textContent = "installed.json not loaded.";
+          } else {
+            const hList = Object.keys(installedData.hosts).map(k => `  • ${k} (${installedData.hosts[k].hostName})`).join('\n');
+            outputEl.textContent = `Configured NixOS Machines:\n${hList}\n\nActive selected host: ${selectedHostKey}`;
+          }
+          break;
+
+        case 'options':
+        case 'ls':
+          let matches = optionsData;
+          if (arg) {
+            matches = matches.filter(o => o.name.toLowerCase().includes(arg.toLowerCase()));
+          }
+          const out = matches.slice(0, 30).map(o => `  ${o.name}  [${o.scope}] -> ${o.type}`).join('\n');
+          outputEl.textContent = `Found ${matches.length} options${arg ? ` matching "${arg}"` : ''} (showing first ${Math.min(matches.length, 30)}):\n${out}`;
+          break;
+
+        case 'cat':
+        case 'info':
+          if (!arg) {
+            outputEl.textContent = "Usage: cat <option_name> (e.g. cat metronome.apps.kitty.enable)";
+          } else {
+            const found = optionsData.find(o => o.name.toLowerCase() === arg.toLowerCase() || o.name.toLowerCase().endsWith(arg.toLowerCase()));
+            if (found) {
+              outputEl.innerHTML = `
+<span style="color: var(--term-cyan); font-weight: bold;">${found.name}</span>
+  Type:        ${found.type}
+  Scope:       ${found.scope}
+  Default:     ${found.default}
+  Description: ${found.description || 'none'}
+  Declared In: ${found.declarations ? found.declarations.join(', ') : 'flake.nix'}
+
+<span style="color: var(--term-green);">Nix snippet:</span>
+  ${found.name} = ${found.type === 'boolean' ? 'true' : (found.default || '"value"')};
+`;
+            } else {
+              outputEl.textContent = `Option "${arg}" not found. Type 'options' to list available attributes.`;
+            }
+          }
+          break;
+
+        case 'packages':
+          if (!installedData) {
+            outputEl.textContent = "installed.json not loaded.";
+          } else {
+            const hObj = installedData.hosts[selectedHostKey] || {};
+            const uObj = (hObj.users && hObj.users.stranger) || {};
+            const pkgs = Array.from(new Set((uObj.packages || []).concat(hObj.systemPackages || []))).sort();
+            let filtered = pkgs;
+            if (arg) filtered = filtered.filter(p => p.toLowerCase().includes(arg.toLowerCase()));
+            outputEl.textContent = `Packages (${filtered.length} total):\n${filtered.join('  ')}`;
+          }
+          break;
+
+        case 'theme':
+          if (!installedData) {
+            outputEl.textContent = "installed.json not loaded.";
+          } else {
+            const hO = installedData.hosts[selectedHostKey] || {};
+            const uO = (hO.users && hO.users.stranger) || {};
+            const th = uO.theme || {};
+            outputEl.innerHTML = `
+Active Theme Settings (${selectedHostKey}):
+  GTK / Window Theme: ${th.name || 'default'}
+  Cursor:             ${th.cursor || 'default'} (${th['cursor-size'] || 24}px)
+  Hyprcursor:         ${th.hyprcursor || 'default'}
+  Icons:              ${th.icons || 'default'}
+`;
+          }
+          break;
+
+        default:
+          outputEl.innerHTML = `command not found: <span style="color: var(--term-red);">${escapeHtml(cmd)}</span>. Type '<span style="color: var(--term-yellow)">help</span>' for command manual.`;
+          break;
+      }
+
+      history.appendChild(outputEl);
+
+      // Auto scroll shell
+      const body = document.getElementById('bottomTermBody');
+      if (body) body.scrollTop = body.scrollHeight;
+    }
+
+    // Helper functions
     function escapeHtml(str) {
       if (typeof str !== 'string') str = JSON.stringify(str);
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -841,6 +2018,7 @@
       return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n');
     }
 
+    // Start
     init();
   </script>
 </body>

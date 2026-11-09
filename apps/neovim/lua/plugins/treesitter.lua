@@ -8,11 +8,14 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
--- Enable Treesitter indentation
+-- Enable Treesitter indentation (leave C/C++ to native cindent)
 vim.api.nvim_create_autocmd("FileType", {
-	callback = function()
-		pcall(function()
-			vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-		end)
+	callback = function(args)
+		local ft = vim.bo[args.buf].filetype
+		if ft ~= "c" and ft ~= "cpp" then
+			pcall(function()
+				vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+			end)
+		end
 	end,
 })
